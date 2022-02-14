@@ -5,3 +5,7 @@ accuracy for genetic search //
 accuracy for all features and electrodes //
 
 ## Figures
+For figure 2a : //
+For figure 2b: run baseline_exploration with args.method="individual" then it comes in figures directory //
+For figure 3a: run baseline_exploration with args.method="individual" then it comes in figures_electrodes_locs directory //
+
