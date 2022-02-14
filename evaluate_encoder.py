@@ -207,7 +207,10 @@ def genetic(args):
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
-        estimator = RandomForestClassifier()
+        if args.classifier=="RF":        
+          estimator = RandomForestClassifier()
+        else:
+          estimator=svm.SVC()
         selector = GeneticSelectionCV(
         estimator,
         cv=5,
