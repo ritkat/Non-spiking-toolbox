@@ -33,6 +33,9 @@ def args():
         "--nfeatures", default=17, type=int, help="Dataset(BCI3)"
     )
     parser.add_argument(
+        "--max_feat", default=5, type=int, help="Dataset(BCI3)"
+    )
+    parser.add_argument(
         "--gen", default=2, type=int, help="Dataset(BCI3)"
     )
     
