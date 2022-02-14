@@ -11,3 +11,6 @@ For figure 3a: run baseline_exploration with args.method="individual" then it co
 For figure 7a: keep all subjects in baseline_exploration with args.method="individual" then it comes in figures directory //
 For figure 8a: keep all subjects in baseline_exploration with args.method="individual" then it comes in figures_electrodes_locs directory //
 
+## Tables
+
+
