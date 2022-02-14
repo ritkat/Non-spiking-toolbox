@@ -7,7 +7,7 @@ def args():
     )
 
     parser.add_argument(
-        "--method", default="individual", type=str, help="Dataset(BCI3)"
+        "--method", default="individual", type=str, help="Feature selection method.(individual/baseline/genetic)"
     )
     # Defining the model
     parser.add_argument(
@@ -15,10 +15,10 @@ def args():
     )
 
     parser.add_argument(
-        "--tstep", default="500", type=str, help="Dataset(BCI3)"
+        "--tstep", default="500", type=str, help="time step for segementing the dataset. (200/300/500/1000/1500/3000)"
     )
     parser.add_argument(
-        "--classifier", default="RF", type=str, help="Dataset(BCI3)"
+        "--classifier", default="RF", type=str, help="Classifier. (SVM/RF)"
     )
     parser.add_argument(
         "--l_feat", default=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], type=str, help="Dataset(BCI3)"
