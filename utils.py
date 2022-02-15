@@ -461,7 +461,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, car):
 
   return df_train, df_test
 
-def createFV_individual_feat(data_train, data_test, fs, l_feat, car):
+def createFV_individual_feat(data_train, fs, l_feat, car):
 
   #subsampling by 4 
   
@@ -632,170 +632,7 @@ def createFV_individual_feat(data_train, data_test, fs, l_feat, car):
 
 
 
-  #subsampling by 4 
-  data_2_subs_t=data_test
-  '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-  for i in range(0, data_test.shape[0]):
-      for j in range(0, data_test.shape[1]):
-          data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
-
-  #data_2_subs_t.shape
-  #Common Average Reference
-  if(car==TRUE):
-    for j in range(0, data_2_subs_t.shape[0]):
-        car=np.zeros((data_2_subs_t.shape[2],))
-        for i in range(0, data_2_subs_t.shape[1]):
-            car= car + data_2_subs_t[j,i,:]
-        car=car/data_2_subs_t.shape[1]
-        #car.shape
-        for k in range(0, data_2_subs_t.shape[1]):
-            data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
-
-  #Standard Scaler
-
-  for j in range(0, data_2_subs_t.shape[0]):
-      kr=data_2_subs_t[j,:,:]
-      
-      scaler=StandardScaler().fit(kr.T)
-      data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
-
-  '''#bandpass filter
-  b, a = signal.butter(2, 0.4, 'low', analog=False)
-  data_2_subs_t = signal.filtfilt(b, a, data_2_subs_t, axis=2)'''
-
-  final_t = np.array([])
-  for j in range(0 ,data_2_subs_t.shape[0]):
-      data_trial=data_2_subs_t[j,:,:].T
-      #data_trial.shape
-
-      data_trial_s1=data_trial[0:int(data_2_subs_t.shape[2]/3),:]
-      #print(data_trial_s1.shape)
-      data_trial_s2=data_trial[int(data_2_subs_t.shape[2]/3):2*int(data_2_subs_t.shape[2]/3),:]
-      #print(data_trial_s2.shape)
-      data_trial_s3=data_trial[2*int(data_2_subs_t.shape[2]/3):3*int(data_2_subs_t.shape[2]/3),:]
-      #print(data_trial_s3.shape)
-
-      #AR Coefficients
-      #from statsmodels.datasets.sunspots import load
-      #data = load()
-      ARFV=np.array([])
-
-      for i in range(0, data_2_subs_t.shape[1]):
-          rho1, sigma1 = sm.regression.linear_model.burg(data_trial_s1[:,i], order=2)
-          rho2, sigma2 = sm.regression.linear_model.burg(data_trial_s2[:,i], order=2)
-          rho3, sigma3 = sm.regression.linear_model.burg(data_trial_s3[:,i], order=2)
-          ARFV=np.append(ARFV, (rho1, rho2, rho3))
-
-      #print(ARFV) 
-
-      HWDFV=np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-          (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          HWDFV=np.append(HWDFV, cA)
-
-      #Spectral Power estimates
-      SPFV=np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-          f1, Pxx_den1 = signal.welch(data_trial_s1[:,i], int(data_2_subs_t.shape[2]/3))
-          f2, Pxx_den2 = signal.welch(data_trial_s2[:,i], int(data_2_subs_t.shape[2]/3))
-          f3, Pxx_den3 = signal.welch(data_trial_s3[:,i], int(data_2_subs_t.shape[2]/3))
-          SPFV=np.append(SPFV, (Pxx_den1, Pxx_den2, Pxx_den3))
-
-      #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV, HWDFV, SPFV), axis=None)
-      concated=np.reshape(concated, (-1, 1))
-      if j==0:
-          final_t=concated
-      else:
-          final_t= np.hstack((final_t, concated))
-      print(j)
-  print(final_t.shape)
-
-  final_t=final_t.T
-  final_t.shape
-
-  eegData_t=np.rollaxis(data_2_subs_t, 0, 3)
-  eegData_t.shape
-
-
-  # Subband Information Quantity
-  # delta (0.5–4 Hz)
-  eegData_delta_t = eeg.filt_data(eegData_t, 0.5, 4, fs)
-  ShannonRes_delta_t = eeg.shannonEntropy(eegData_delta_t, bin_min=-200, bin_max=200, binWidth=2)
-  # theta (4–8 Hz)
-  eegData_theta_t = eeg.filt_data(eegData_t, 4, 8, fs)
-  ShannonRes_theta_t = eeg.shannonEntropy(eegData_theta_t, bin_min=-200, bin_max=200, binWidth=2)
-  # alpha (8–12 Hz)
-  eegData_alpha_t = eeg.filt_data(eegData_t, 8, 12, fs)
-  ShannonRes_alpha_t = eeg.shannonEntropy(eegData_alpha_t, bin_min=-200, bin_max=200, binWidth=2)
-  # beta (12–30 Hz)
-  eegData_beta_t = eeg.filt_data(eegData_t, 12, 30, fs)
-  ShannonRes_beta_t = eeg.shannonEntropy(eegData_beta_t, bin_min=-200, bin_max=200, binWidth=2)
-  # gamma (30–100 Hz)
-  eegData_gamma_t = eeg.filt_data(eegData_t, 30, 80, fs)
-  ShannonRes_gamma_t = eeg.shannonEntropy(eegData_gamma_t, bin_min=-200, bin_max=200, binWidth=2)
-
-  # Hjorth Mobility
-  # Hjorth Complexity
-  HjorthMob_t, HjorthComp_t = eeg.hjorthParameters(eegData_t)
-
-
-  # Median Frequency
-  medianFreqRes_t = eeg.medianFreq(eegData_t,fs)
-
-  # Standard Deviation
-  std_res_t = eeg.eegStd(eegData_t)
-
-  # Regularity (burst-suppression)
-  regularity_res_t = eeg.eegRegularity(eegData_t,fs)
-
-  # Spikes
-  minNumSamples = int(70*fs/1000)
-  spikeNum_res_t = eeg.spikeNum(eegData_t,minNumSamples)
-
-
-  # Sharp spike
-  sharpSpike_res_t = eeg.shortSpikeNum(eegData_t,minNumSamples)
-  #REMPMVPOMMPOMPOMPOMPOMOMPOMPOM
-  concated_t=np.concatenate(( ShannonRes_delta_t.T, ShannonRes_theta_t.T, ShannonRes_alpha_t.T, ShannonRes_beta_t.T, ShannonRes_gamma_t.T, HjorthMob_t.T, HjorthComp_t.T, medianFreqRes_t.T, std_res_t.T, regularity_res_t.T, spikeNum_res_t.T, sharpSpike_res_t.T), axis=1)
-
-  final_t=np.hstack((final_t, concated_t))
-
-  # δ band Power
-  bandPwr_delta_t = eeg.bandPower(eegData_t, 0.5, 4, fs)
-  #too large
-  # θ band Power
-  bandPwr_theta_t = eeg.bandPower(eegData_t, 4, 8, fs)
-  #too large
-  # α band Power
-  bandPwr_alpha_t = eeg.bandPower(eegData_t, 8, 12, fs)
-  #too large
-  # β band Power
-  bandPwr_beta_t = eeg.bandPower(eegData_t, 12, 30, fs)
-  #too large
-  # γ band Power
-  bandPwr_gamma_t = eeg.bandPower(eegData_t, 30, 80, fs)
-
-  concated_n_t= bandPwr_gamma_t.T
-  final_t=np.hstack((final_t, concated_n_t))
-  #final_t.shape
-
-  HTFV_t=np.array([])
-  for j in range(0, eegData_t.shape[2]):
-    eegData_temp=eegData_t[:,:,j]
-    HTFV_temp=np.array([])
-    for i in range(0, eegData.shape[0]):
-      HTFV_temp=np.append(HTFV_temp, np.imag(hilbert(eegData_temp[i,:])))
-    if(j==0):
-      HTFV_t=HTFV_temp
-    else:
-      HTFV_t=np.vstack((HTFV_t, HTFV_temp))
-
-
-    print(j)
-
-  final_t=np.hstack((final_t, HTFV_t))
-  final_t.shape
+ 
 
   #importance per feature
   nfeatures_1=ARFV.shape[0]
@@ -862,7 +699,7 @@ def createFV_individual_feat(data_train, data_test, fs, l_feat, car):
   print(final.shape)
 
   final=final[:,numpl]
-  final_t=final_t[:,numpl]
+  #final_t=final_t[:,numpl]
 
   print(final.shape)
 
@@ -871,7 +708,7 @@ def createFV_individual_feat(data_train, data_test, fs, l_feat, car):
     list_rand.append("c"+str(i))
   len(list_rand)
   df_train = pd.DataFrame(final, columns = list_rand)
-  df_test = pd.DataFrame(final_t, columns = list_rand)
+  #df_test = pd.DataFrame(final_t, columns = list_rand)
 
-  return df_train, df_test, llim, nfeatures
+  return df_train, llim, nfeatures
 
