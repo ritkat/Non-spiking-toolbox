@@ -452,6 +452,7 @@ def individual(args):
         labels_test_loop=label_data_test[str(args.tstep)]
 
         acc={}
+        best_params={}
         for k in range(data_train_loop.shape[1]):
             acc[str(k)]=[]
 
@@ -468,6 +469,7 @@ def individual(args):
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0)
                 clf.fit(df_train_temp.values, labels_train_loop)
+                best_params_ie[str(i)].append(clf.best_params_)
                 predictions = clf.predict(df_test_temp.values)
                 acc[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
             # Without feature selection check accuracy with Random forest    
@@ -493,13 +495,17 @@ def individual(args):
                 distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                 clf = RandomizedSearchCV(svma, distributions, random_state=0)
             clf.fit(df_train_temp.values, labels_train_loop)
+            
             predictions = clf.predict(df_test_temp.values)
             accf[str(i)].append(metrics.accuracy_score(labels_train_loop,predictions))
         # Without feature selection check accuracy with Random forest    
         for k in range(n_features):
             accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)]) 
+            
+        sd=0
+        sdf=0
 
-        return acc, accf
+        return acc, sd, accf, sdf, best_params_ie
 
 
 
@@ -565,6 +571,7 @@ def individual(args):
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
+                best_params_ie[str(i)].append(clf.best_params_)
                 predictions = clf.predict(df_test_temp.values)
                 acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
             # Without feature selection check accuracy with Random forest    
@@ -595,6 +602,7 @@ def individual(args):
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
+                best_params_ie[].append(
                 predictions = clf.predict(df_test_temp.values)
                 accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
             # Without feature selection check accuracy with Random forest    
@@ -606,7 +614,7 @@ def individual(args):
 
         
 
-        return acc, sd, accf, sdf
+        return acc, sd, accf, sdf, best_params_ie
         #sb="jc_mot"
     
 
