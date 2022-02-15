@@ -552,7 +552,7 @@ def individual(args):
         #fs=int(segment_length[i]/3)
         acc={}
         sd={}
-        best_params={}
+        best_params_ie={}
         l_feat=args.l_feat
         n_iter=args.niter
         #n_generations=40
@@ -561,7 +561,7 @@ def individual(args):
         for k in range(data_train_loop.shape[1]):
             sd[str(k)]=[] 
         for k in range(data_train_loop.shape[1]):
-            best_params[str(k)]=[]
+            best_params_ie[str(k)]=[]
         
         for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
             for i in range(data_train_loop.shape[1]):
