@@ -317,11 +317,12 @@ def baseline(args):
         distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
         clf = RandomizedSearchCV(svma, distributions, random_state=0)
     clf.fit(df_train_temp.values, labels_train_loop)
+    best_params=clf.best_params_
     pred = clf.predict(df_test_temp.values)
     acc=metrics.accuracy_score(labels_test_loop,pred)
     sd=0
 
-    return acc,sd
+    return acc,sd, best_params
 
 
   else:
@@ -380,6 +381,7 @@ def baseline(args):
             distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
             clf = RandomizedSearchCV(svma, distributions, random_state=0)
         clf.fit(df_train_temp.values, labels_train_loop[train_index])
+        best_params=clf.best_params_
         pred = clf.predict(df_test_temp.values)
         acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
         
@@ -388,7 +390,7 @@ def baseline(args):
 
     
 
-    return accd, sd 
+    return accd, sd, best_params_
 
 
 def individual(args):
