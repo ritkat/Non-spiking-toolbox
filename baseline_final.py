@@ -17,7 +17,8 @@ import time
 if __name__ == '__main__':
 
     args = my_args()
-    args.method="genetic"
+    #Run baseline mode for all features and all electrodes
+    args.method="baseline"
     if(args.method=="genetic"):
         print(args.__dict__)
         # Fix the seed of all random number generator
