@@ -455,6 +455,8 @@ def individual(args):
         best_params={}
         for k in range(data_train_loop.shape[1]):
             acc[str(k)]=[]
+        for k in range(data_train_loop.shape[1]):
+            best_params[str(k)]=[]
 
         for i in range(data_train_loop.shape[1]):
                 df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:], 1000, l_feat, False)
@@ -550,6 +552,7 @@ def individual(args):
         #fs=int(segment_length[i]/3)
         acc={}
         sd={}
+        best_params={}
         l_feat=args.l_feat
         n_iter=args.niter
         #n_generations=40
@@ -557,6 +560,9 @@ def individual(args):
             acc[str(k)]=[]
         for k in range(data_train_loop.shape[1]):
             sd[str(k)]=[] 
+        for k in range(data_train_loop.shape[1]):
+            best_params[str(k)]=[]
+        
         for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
             for i in range(data_train_loop.shape[1]):
                 df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
@@ -583,6 +589,7 @@ def individual(args):
 
         n_features=args.nfeatures
         accf={}
+        
         sdf={}
         for k in range(n_features):
             accf[str(k)]=[]  
@@ -602,7 +609,7 @@ def individual(args):
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
-                best_params_ie[str(i)].append(clf.best_params_)
+                
                 predictions = clf.predict(df_test_temp.values)
                 accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
             # Without feature selection check accuracy with Random forest    
