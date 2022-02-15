@@ -24,7 +24,7 @@ if __name__ == '__main__':
         seed = 50
         random.seed(seed)
         np.random.seed(seed)
-        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy":[], "accuracy std":[],"generaton":[], "max_features":[],"gen accuracy":[], "gen std":[],"selected features":[], "nfeatures":[]})
+        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy":[], "accuracy std":[],"generaton":[], "max_features":[],"gen accuracy":[], "gen std":[],"selected features":[], "nfeatures":[], "params":[]})
 
         parameters = dict(dataset=["jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"],
         tstep=[500, 1000], maxft=[5]
@@ -38,9 +38,9 @@ if __name__ == '__main__':
         param_values = [v for v in parameters.values()]
 
         for args.dataset,args.tstep,args.maxft in product(*param_values):
-            accd, gen, self, nfeat, sd, genstd=genetic(args)
+            accd, gen, self, nfeat, sd, genstd, params=genetic(args)
             for n in range(args.gen+1):
-                df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "accuracy std":sd,"generation":n, "max_features":args.max_feat,"gen accuracy":gen[str(n)],"gen std":genstd[str(n)],"selected features":self,"nfeatures":nfeat},ignore_index=True)
+                df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "accuracy std":sd,"generation":n, "max_features":args.max_feat,"gen accuracy":gen[str(n)],"gen std":genstd[str(n)],"selected features":self,"nfeatures":nfeat, "params":params},ignore_index=True)
                 log_file_name = 'accuracy_log_'+args.dataset+'.csv'
                 pwd = os.getcwd()
                 log_dir = pwd+'/log_dir/'
