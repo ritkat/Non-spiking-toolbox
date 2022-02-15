@@ -61,7 +61,7 @@ if __name__ == '__main__':
             # logger.info('All done.')'''
 
     elif(args.method=="individual"):
-        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy ind electrodes":[],"sd ind electrodes":[],"accuracy ind features":[],"sd ind features":[],"classifier":[]})
+        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy ind electrodes":[],"sd ind electrodes":[],"accuracy ind features":[],"sd ind features":[],"classifier":[], "best_params":[]})
 
         parameters = dict(dataset=["jc_mot"],
         tstep=[500],classifier=["SVM","RF"]
@@ -76,9 +76,9 @@ if __name__ == '__main__':
         param_values = [v for v in parameters.values()]
         for args.dataset,args.tstep,args.classifier in product(*param_values):
 
-            acc,sd,accf,sdf=individual(args)
+            acc,sd,accf,sdf,best_params=individual(args)
             #for n in range(args.gen+1):
-            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy ind electrodes":acc,"sd ind electrodes":sd,"accuracy ind features":accf,"sd ind features":sdf,"classifier":args.classifier},ignore_index=True)
+            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy ind electrodes":acc,"sd ind electrodes":sd,"accuracy ind features":accf,"sd ind features":sdf,"classifier":args.classifier,"best_params":best_params},ignore_index=True)
             log_file_name = 'accuracy_log_'+args.dataset+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
