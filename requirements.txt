@@ -1,0 +1,2 @@
+dit==1.2.3
+pyod==0.8.1 #For the example
