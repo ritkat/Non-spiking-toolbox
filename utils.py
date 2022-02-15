@@ -227,7 +227,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, car):
 
   #data_2_subs_t.shape
   #Common Average Reference
-  if(car==TRUE):
+  if(car==True):
     for j in range(0, data_2_subs_t.shape[0]):
         car=np.zeros((data_2_subs_t.shape[2],))
         for i in range(0, data_2_subs_t.shape[1]):
