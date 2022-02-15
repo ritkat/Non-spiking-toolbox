@@ -245,9 +245,10 @@ def genetic(args):
     accd=sum(acc)/len(acc)
     sd=np.std(acc)
     for k in range(args.gen+1):
-      gen[str(k)]=sum(gen[str(k)])/len(gen[str(k)])
-    for k in range(args.gen+1):
       genstd[str(k)]=np.std(gen[str(k)])
+    for k in range(args.gen+1):
+      gen[str(k)]=sum(gen[str(k)])/len(gen[str(k)])
+
 
     
 
