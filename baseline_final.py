@@ -169,7 +169,7 @@ if __name__ == '__main__':
         # logger.info('All done.')'''
 
     elif(args.method=="baseline"):
-        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy":[],"classifier":[]})
+        df = pd.DataFrame({"dataset":[],"tstep":[],"accuracy":[],"classifier":[],"best_params":[]})
 
         parameters = dict(dataset=["bci3"],
         tstep=[500],classifier=["SVM","RF"]
