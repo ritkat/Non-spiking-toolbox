@@ -186,7 +186,7 @@ if __name__ == '__main__':
             accd,sd,best_params=baseline(args)
             #for n in range(args.gen+1):
             df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "std":sd,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
-            log_file_name = 'accuracy_log_'+str(args.run)+'.csv'
+            log_file_name = 'accuracy_log_'+str(args.dataset)+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
             df.to_csv(log_dir+log_file_name, index=False)
