@@ -134,6 +134,7 @@ def genetic(args):
     caching=True,
     n_jobs=100,)
     selector = selector.fit(df_train_temp.values, labels_train_loop)
+    params=selector.estimator_
     tempo=np.where(selector.support_.astype(int)==1)[0]
     sel.append(tempo)
 
@@ -150,7 +151,7 @@ def genetic(args):
     for k in range(args.gen+1):
       genstd[str(k)]=0
 
-    return accd, gen, self, nfeat, sd, genstd
+    return accd, gen, self, nfeat, sd, genstd, params
 
   else:
 
@@ -228,6 +229,7 @@ def genetic(args):
         caching=True,
         n_jobs=100,)
         selector = selector.fit(df_train_temp.values, labels_train_loop[train_index])
+        params=selector.estimator_
         tempo=np.where(selector.support_.astype(int)==1)[0]
         sel.append(tempo)
 
@@ -246,7 +248,7 @@ def genetic(args):
 
     
 
-    return accd, gen, self, nfeat, sd, genstd
+    return accd, gen, self, nfeat, sd, genstd, params
 
 def baseline(args):
   if args.dataset=="bci3":
