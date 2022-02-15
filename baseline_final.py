@@ -73,100 +73,97 @@ if __name__ == '__main__':
         args.niter=200
 
         param_values = [v for v in parameters.values()]
-        all_combinations = product(*param_values)
-        iterator = islice(all_combinations, args.run, args.run+1)
-        args.dataset,args.tstep,args.classifier = next(iterator)
+        for args.dataset,args.tstep,args.classifier in product(*param_values):
+
+            acc,sd,accf,sdf=individual(args)
+            #for n in range(args.gen+1):
+            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy ind electrodes":acc,"sd ind electrodes":sd,"accuracy ind features":accf,"sd ind features":sdf,"classifier":args.classifier},ignore_index=True)
+            log_file_name = 'accuracy_log_'+str(args.run)+'.csv'
+            pwd = os.getcwd()
+            log_dir = pwd+'/log_dir/'
+            df.to_csv(log_dir+log_file_name, index=False)
+
+            df.to_csv(log_file_name, index=False)
+
+            '''accuracy_df = pd.DataFrame({"Electrodes": np.arange(1,len(acc)+1), "Accuracy":list(acc.values())})
+            # plot the feature importances in bars.
+            plt.figure(figsize=(20,10))
+            #plt.xticks(rotation=45)
+            sns.set(font_scale=3)
+            sns.lineplot(x="Electrodes",y= "Accuracy", data=accuracy_df)
+            plt.savefig('./figures/accuracy_individual_electrodes'+args.dataset+'.png')
+            plt.show()'''
+
+            accuracy_n={}
+            i=0
+            for capital in acc.values():
+                i=i+1
+                accuracy_n[str(i)]=int(capital*100)
+
+            acc_data = list(accuracy_n.items())
+            an_array = np.array(acc_data)
+
+            import scipy.io as sio
+            mat_contents = sio.loadmat('./locs/'+args.dataset[:2]+'_electrodes.mat')
+            locs=mat_contents["electrodes"]
+            dfm=pd.DataFrame({'x Taliarich':locs[:,0],'y Taliarich':locs[:,1], 'z Taliarich':locs[:,2], 'accuracy':an_array[:,1]})
+            l=[]
+            for i in dfm.values[:,3]:
+                i = int(i)
+                l.append(i)
+
+            plt.style.use('seaborn')
+            plt.figure(figsize=(15,5))
+            plt.subplot(1, 3, 1)
+            plt.scatter(dfm["x Taliarich"], dfm["y Taliarich"], c=l, cmap="viridis")
+            #plt.clim(vmin = 0.4, vmax = 0.45)
+            plt.title('Electrode locations')
+            plt.xlabel('x Taliarich')
+            plt.ylabel('y Taliarich')
+            clb=plt.colorbar()
+            clb.set_label('Accuracy')
+
+            plt.subplot(1, 3, 2)
+            plt.scatter(dfm["y Taliarich"], dfm["z Taliarich"], c=l, cmap="viridis")
+            #plt.clim(vmin = 0.4, vmax = 0.45)
+            plt.title('Electrode locations')
+            plt.xlabel('y Taliarich')
+            plt.ylabel('z Taliarich')
+            clb=plt.colorbar()
+            clb.set_label('Accuracy')
+
+            plt.subplot(1, 3, 3)
+            plt.scatter(dfm["z Taliarich"], dfm["x Taliarich"], c=l, cmap="viridis")
+            #plt.clim(vmin = 0.4, vmax = 0.45)
+            plt.title('Electrode locations')
+            plt.xlabel('z Taliarich')
+            plt.ylabel('x Taliarich')
+            clb=plt.colorbar()
+            clb.set_label('Accuracy')
+
+            plt.tight_layout()
+            plt.savefig("./figures_electrode_locs/"+args.dataset)
 
 
-        acc,sd,accf,sdf=individual(args)
-        #for n in range(args.gen+1):
-        df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy ind electrodes":acc,"sd ind electrodes":sd,"accuracy ind features":accf,"sd ind features":sdf,"classifier":args.classifier},ignore_index=True)
-        log_file_name = 'accuracy_log_'+str(args.run)+'.csv'
-        pwd = os.getcwd()
-        log_dir = pwd+'/log_dir/'
-        df.to_csv(log_dir+log_file_name, index=False)
+            accuracy_df = pd.DataFrame({"Electrodes": np.arange(1,len(accf)+1), "Accuracy":list(accf.values())})
+            # plot the feature importances in bars.
+            plt.figure(figsize=(20,10))
+            #plt.xticks(rotation=45)
+            sns.set(font_scale=3)
+            sns.lineplot(x="Electrodes",y= "Accuracy", data=accuracy_df)
+            plt.savefig('./figures/accuracy_individual_features'+args.dataset+'.png')
+            plt.show()
 
-        df.to_csv(log_file_name, index=False)
-
-        '''accuracy_df = pd.DataFrame({"Electrodes": np.arange(1,len(acc)+1), "Accuracy":list(acc.values())})
-        # plot the feature importances in bars.
-        plt.figure(figsize=(20,10))
-        #plt.xticks(rotation=45)
-        sns.set(font_scale=3)
-        sns.lineplot(x="Electrodes",y= "Accuracy", data=accuracy_df)
-        plt.savefig('./figures/accuracy_individual_electrodes'+args.dataset+'.png')
-        plt.show()'''
-
-        accuracy_n={}
-        i=0
-        for capital in acc.values():
-            i=i+1
-            accuracy_n[str(i)]=int(capital*100)
-
-        acc_data = list(accuracy_n.items())
-        an_array = np.array(acc_data)
-
-        import scipy.io as sio
-        mat_contents = sio.loadmat('./locs/'+args.dataset[:2]+'_electrodes.mat')
-        locs=mat_contents["electrodes"]
-        dfm=pd.DataFrame({'x Taliarich':locs[:,0],'y Taliarich':locs[:,1], 'z Taliarich':locs[:,2], 'accuracy':an_array[:,1]})
-        l=[]
-        for i in dfm.values[:,3]:
-            i = int(i)
-            l.append(i)
-
-        plt.style.use('seaborn')
-        plt.figure(figsize=(15,5))
-        plt.subplot(1, 3, 1)
-        plt.scatter(dfm["x Taliarich"], dfm["y Taliarich"], c=l, cmap="viridis")
-        #plt.clim(vmin = 0.4, vmax = 0.45)
-        plt.title('Electrode locations')
-        plt.xlabel('x Taliarich')
-        plt.ylabel('y Taliarich')
-        clb=plt.colorbar()
-        clb.set_label('Accuracy')
-
-        plt.subplot(1, 3, 2)
-        plt.scatter(dfm["y Taliarich"], dfm["z Taliarich"], c=l, cmap="viridis")
-        #plt.clim(vmin = 0.4, vmax = 0.45)
-        plt.title('Electrode locations')
-        plt.xlabel('y Taliarich')
-        plt.ylabel('z Taliarich')
-        clb=plt.colorbar()
-        clb.set_label('Accuracy')
-
-        plt.subplot(1, 3, 3)
-        plt.scatter(dfm["z Taliarich"], dfm["x Taliarich"], c=l, cmap="viridis")
-        #plt.clim(vmin = 0.4, vmax = 0.45)
-        plt.title('Electrode locations')
-        plt.xlabel('z Taliarich')
-        plt.ylabel('x Taliarich')
-        clb=plt.colorbar()
-        clb.set_label('Accuracy')
-
-        plt.tight_layout()
-        plt.savefig("./figures_electrode_locs/"+args.dataset)
-
-
-        accuracy_df = pd.DataFrame({"Electrodes": np.arange(1,len(accf)+1), "Accuracy":list(accf.values())})
-        # plot the feature importances in bars.
-        plt.figure(figsize=(20,10))
-        #plt.xticks(rotation=45)
-        sns.set(font_scale=3)
-        sns.lineplot(x="Electrodes",y= "Accuracy", data=accuracy_df)
-        plt.savefig('./figures/accuracy_individual_features'+args.dataset+'.png')
-        plt.show()
-
-        '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
-        # plot the feature importances in bars.
-        plt.figure(figsize=(40,10))
-        #plt.xticks(rotation=45)
-        sns.set(font_scale=2)
-        sns.lineplot(x="Tstep",y= "Accuracy", data=accuracy_df)
-        plt.savefig(pwd+'/figures/'+args.dataset+'_accuracy.png')
-        plt.tight_layout()
-        plt.show()
-        # logger.info('All done.')'''
+            '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
+            # plot the feature importances in bars.
+            plt.figure(figsize=(40,10))
+            #plt.xticks(rotation=45)
+            sns.set(font_scale=2)
+            sns.lineplot(x="Tstep",y= "Accuracy", data=accuracy_df)
+            plt.savefig(pwd+'/figures/'+args.dataset+'_accuracy.png')
+            plt.tight_layout()
+            plt.show()
+            # logger.info('All done.')'''
 
     elif(args.method=="baseline"):
         df = pd.DataFrame({"dataset":[],"tstep":[],"accuracy":[],"classifier":[],"best_params":[]})
