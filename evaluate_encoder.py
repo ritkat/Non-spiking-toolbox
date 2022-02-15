@@ -390,7 +390,7 @@ def baseline(args):
 
     
 
-    return accd, sd, best_params_
+    return accd, sd, best_params
 
 
 def individual(args):
