@@ -182,28 +182,24 @@ if __name__ == '__main__':
         args.niter=200
 
         param_values = [v for v in parameters.values()]
-        all_combinations = product(*param_values)
-        iterator = islice(all_combinations, args.run, args.run+1)
-        args.dataset,args.tstep,args.classifier = next(iterator)
+        for args.dataset,args.tstep,args.classifier in product(*param_values):
+            accd,sd,best_params=baseline(args)
+            #for n in range(args.gen+1):
+            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "std":sd,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
+            log_file_name = 'accuracy_log_'+str(args.run)+'.csv'
+            pwd = os.getcwd()
+            log_dir = pwd+'/log_dir/'
+            df.to_csv(log_dir+log_file_name, index=False)
 
-        
-        accd,sd=baseline(args)
-        #for n in range(args.gen+1):
-        df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "std":sd,"classifier":args.classifier},ignore_index=True)
-        log_file_name = 'accuracy_log_'+str(args.run)+'.csv'
-        pwd = os.getcwd()
-        log_dir = pwd+'/log_dir/'
-        df.to_csv(log_dir+log_file_name, index=False)
+            df.to_csv(log_file_name, index=False)
 
-        df.to_csv(log_file_name, index=False)
-
-        '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
-        # plot the feature importances in bars.
-        plt.figure(figsize=(40,10))
-        #plt.xticks(rotation=45)
-        sns.set(font_scale=2)
-        sns.lineplot(x="Tstep",y= "Accuracy", data=accuracy_df)
-        plt.savefig(pwd+'/figures/'+args.dataset+'_accuracy.png')
-        plt.tight_layout()
-        plt.show()
-        # logger.info('All done.')'''
+            '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
+            # plot the feature importances in bars.
+            plt.figure(figsize=(40,10))
+            #plt.xticks(rotation=45)
+            sns.set(font_scale=2)
+            sns.lineplot(x="Tstep",y= "Accuracy", data=accuracy_df)
+            plt.savefig(pwd+'/figures/'+args.dataset+'_accuracy.png')
+            plt.tight_layout()
+            plt.show()
+            # logger.info('All done.')'''
