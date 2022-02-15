@@ -78,7 +78,7 @@ if __name__ == '__main__':
             acc,sd,accf,sdf=individual(args)
             #for n in range(args.gen+1):
             df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy ind electrodes":acc,"sd ind electrodes":sd,"accuracy ind features":accf,"sd ind features":sdf,"classifier":args.classifier},ignore_index=True)
-            log_file_name = 'accuracy_log_'+str(args.dataset)+'.csv'
+            log_file_name = 'accuracy_log_'+args.dataset+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
             df.to_csv(log_dir+log_file_name, index=False)
