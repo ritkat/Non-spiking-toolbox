@@ -753,8 +753,11 @@ def topn_elec(args):
         final_df["main"]=np.arange(data_train_loop.shape[1])
         temp_df=final_df.sort_values(by='Importances', ascending=False)
         topn=temp_df.values[:,2]
+        topn=topn.tolist()
+        for i in range(0, len(topn)):
+          topn[i] = int(topn[i])
         print("topn electrodes :",topn)
-        print("topn electrodes datatype :", topn.dtype)
+        #print("topn electrodes datatype :", topn.dtype)
 
         keys=[]
         for i in range(0, data_train_loop.shape[1]):
@@ -904,8 +907,11 @@ def topn_elec(args):
         final_df["main"]=np.arange(data_train_loop.shape[1])
         temp_df=final_df.sort_values(by='Importances', ascending=False)
         topn=temp_df.values[:,2]
+        topn=topn.tolist()
+        for i in range(0, len(topn)):
+          topn[i] = int(topn[i])
         print("topn electrodes :",topn)
-        print("topn electrodes datatype :", topn.dtype)
+        #print("topn electrodes datatype :", topn.dtype)
 
         keys=[]
         for i in range(0, data_train_loop.shape[1]):
