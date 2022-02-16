@@ -95,7 +95,7 @@ if __name__ == '__main__':
             plt.savefig('./figures/accuracy_individual_electrodes'+args.dataset+'.png')
             plt.show()'''
 
-            accuracy_n={}
+            '''accuracy_n={}
             i=0
             for capital in acc.values():
                 i=i+1
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             sns.set(font_scale=3)
             sns.lineplot(x="Electrodes",y= "Accuracy", data=accuracy_df)
             plt.savefig('./figures/accuracy_individual_features'+args.dataset+'.png')
-            plt.show()
+            plt.show()'''
 
             '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
             # plot the feature importances in bars.
