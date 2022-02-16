@@ -584,8 +584,8 @@ def individual(args):
             # Without feature selection check accuracy with Random forest   
         for k in range(data_train_loop.shape[1]):
             sd[str(k)]=np.std(acc[str(k)])
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)])
+        '''for k in range(data_train_loop.shape[1]):
+            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)])'''
             
 
 
@@ -617,8 +617,8 @@ def individual(args):
             # Without feature selection check accuracy with Random forest  
         for k in range(n_features):
             sdf[str(k)]=np.std(accf[str(k)])
-        for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])
+        '''for k in range(n_features):
+            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])'''
         
 
 
