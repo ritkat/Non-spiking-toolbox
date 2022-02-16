@@ -927,7 +927,7 @@ def topn_elec(args):
         for i in range(data_train_loop.shape[1]):
             sd[str(i)]=[]
 
-        for train_index, test_index in kf3.split(data_train_loop):
+        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
             for i in range(data_train_loop.shape[1]):
                 data_train=data_train_loop[train_index]
                 data_test=data_train_loop[test_index]
