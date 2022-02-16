@@ -47,7 +47,7 @@ def segment(data_trial, segment_length=500):
 
   return data_final
 
-def createFV_individual(data_train, data_test, fs, l_feat, car):
+def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
   #subsampling by 4 
   
@@ -59,7 +59,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, car):
 
   #data_2_subs.shape
   
-  if(car==True):
+  if(c_ref==True):
   #Common Average Reference
     for j in range(0, data_train.shape[0]):
         car=np.zeros((data_2_subs.shape[2],))
@@ -227,7 +227,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, car):
 
   #data_2_subs_t.shape
   #Common Average Reference
-  if(car==True):
+  if(c_ref==True):
     for j in range(0, data_2_subs_t.shape[0]):
         car=np.zeros((data_2_subs_t.shape[2],))
         for i in range(0, data_2_subs_t.shape[1]):
@@ -461,7 +461,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, car):
 
   return df_train, df_test
 
-def createFV_individual_feat(data_train, fs, l_feat, car):
+def createFV_individual_feat(data_train, fs, l_feat, c_ref):
 
   #subsampling by 4 
   
@@ -473,7 +473,7 @@ def createFV_individual_feat(data_train, fs, l_feat, car):
 
   #data_2_subs.shape
   
-  if(car==True):
+  if(c_ref==True):
   #Common Average Reference
     for j in range(0, data_train.shape[0]):
         car=np.zeros((data_2_subs.shape[2],))
