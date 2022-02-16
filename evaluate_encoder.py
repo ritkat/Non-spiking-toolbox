@@ -220,7 +220,7 @@ def genetic(args):
         cv=5,
         verbose=1,
         scoring="accuracy",
-        max_features=5,
+        max_features=args.max_feat,
         n_population=300,
         crossover_proba=0.5,
         mutation_proba=0.2,
