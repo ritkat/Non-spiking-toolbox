@@ -388,9 +388,10 @@ def baseline(args):
         best_params=clf.best_params_
         pred = clf.predict(df_test_temp.values)
         acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
-        
-    accd=sum(acc)/len(acc)
+    
     sd=np.std(acc)
+    accd=sum(acc)/len(acc)
+    
 
     
 
@@ -580,11 +581,12 @@ def individual(args):
                 best_params_ie[str(i)].append(clf.best_params_)
                 predictions = clf.predict(df_test_temp.values)
                 acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest    
+            # Without feature selection check accuracy with Random forest   
+        for k in range(data_train_loop.shape[1]):
+            sd[str(k)]=np.std(acc[str(k)])
         for k in range(data_train_loop.shape[1]):
             acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)])
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=np.std(acc[str(k)])    
+            
 
 
         n_features=args.nfeatures
@@ -612,11 +614,12 @@ def individual(args):
                 
                 predictions = clf.predict(df_test_temp.values)
                 accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest    
-        for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])
+            # Without feature selection check accuracy with Random forest  
         for k in range(n_features):
             sdf[str(k)]=np.std(accf[str(k)])
+        for k in range(n_features):
+            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])
+        
 
 
         
