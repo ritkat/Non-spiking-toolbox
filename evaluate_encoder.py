@@ -700,7 +700,7 @@ def topn_elec(args):
         #importance per electrode
         n_electrodes=data_train_loop.shape[1]
         #dictionary of features
-        nfeatures=[]
+        #nfeatures=[]
         f1=nfeatures[0]/n_electrodes
         f2=nfeatures[1]/n_electrodes
         f3=nfeatures[2]/n_electrodes
@@ -851,7 +851,7 @@ def topn_elec(args):
 
         n_electrodes=data_train_loop.shape[1]
         #dictionary of features
-        nfeatures=[]
+        #nfeatures=[]
         f1=nfeatures[0]/n_electrodes
         f2=nfeatures[1]/n_electrodes
         f3=nfeatures[2]/n_electrodes
