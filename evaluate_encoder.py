@@ -824,6 +824,8 @@ def topn_elec(args):
         training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
         label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
         segment_length=[500,1000,1500,3000]
+        l_feat=args.l_feat 
+        n_iter=args.niter
 
 
         kf3 = StratifiedKFold(n_splits=3, shuffle=False)
