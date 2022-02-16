@@ -688,14 +688,14 @@ def topn_elec(args):
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
         rf = RandomForestClassifier()
-        distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
+        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
         df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        clf.fit(data_train_loop, labels_train_loop)
+        rf.fit(data_train_loop, labels_train_loop)
         
         # Without feature selection check auuracy with Random forest
 
-        importances = clf.feature_importances_
+        importances = rf.feature_importances_
 
         #importance per electrode
         n_electrodes=data_train_loop.shape[1]
@@ -839,14 +839,14 @@ def topn_elec(args):
         #fs=int(segment_length[i]/3)
 
         rf = RandomForestClassifier()
-        distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        clf.fit(data_train_loop, labels_train_loop)
+        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)'''
+        rf.fit(data_train_loop, labels_train_loop)
         
         # Without feature selection check auuracy with Random forest
 
-        importances = clf.feature_importances_
+        importances = rf.feature_importances_
         print(importances)
 
         n_electrodes=data_train_loop.shape[1]
