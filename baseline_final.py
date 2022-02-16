@@ -201,44 +201,9 @@ if __name__ == '__main__':
             plt.tight_layout()
             plt.show()
             # logger.info('All done.')'''
-            
-    elif(args.method=="topn"):
-        df = pd.DataFrame({"dataset":[],"tstep":[],"accuracy":[],"std":[],"classifier":[],"best_params":[]})
+           
 
-        parameters = dict(dataset=["bci3"],
-        tstep=[500],classifier=["SVM","RF"]
-        )
-
-        n_generations=10
-        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
-        #args.gen=n_generations
-        args.l_feat=l_feat
-        args.niter=200
-
-        param_values = [v for v in parameters.values()]
-        for args.dataset,args.tstep,args.classifier in product(*param_values):
-            acc,best_params,sd=topn_elec(args)
-            #for n in range(args.gen+1):
-            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":acc, "std":sd,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
-            log_file_name = 'accuracy_topn_log_'+str(args.dataset)+'.csv'
-            pwd = os.getcwd()
-            log_dir = pwd+'/log_dir/'
-            df.to_csv(log_dir+log_file_name, index=False)
-
-            df.to_csv(log_file_name, index=False)
-
-            '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
-            # plot the feature importances in bars.
-            plt.figure(figsize=(40,10))
-            #plt.xticks(rotation=45)
-            sns.set(font_scale=2)
-            sns.lineplot(x="Tstep",y= "Accuracy", data=accuracy_df)
-            plt.savefig(pwd+'/figures/'+args.dataset+'_accuracy.png')
-            plt.tight_layout()
-            plt.show()
-            # logger.info('All done.')'''
-
-    elif(args.method=="topn"):
+    elif(args.method=="topn_elec"):
         df = pd.DataFrame({"dataset":[],"tstep":[],"accuracy":[],"std":[],"classifier":[],"best_params":[]})
 
         parameters = dict(dataset=["bci3"],
