@@ -25,7 +25,7 @@ if __name__ == '__main__':
         seed = 50
         random.seed(seed)
         np.random.seed(seed)
-        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy":[], "accuracy std":[],"generaton":[], "max_features":[],"gen accuracy":[], "gen std":[],"selected features":[], "nfeatures":[], "params":[]})
+        df = pd.DataFrame({"dataset":[],"tstep":[], "accuracy":[], "accuracy std":[],"generation":[], "max_features":[],"gen accuracy":[], "gen std":[],"selected features":[], "nfeatures":[], "params":[]})
 
         parameters = dict(dataset=["jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"],
         tstep=[500, 1000], maxft=[5], classifier=["RF"]
