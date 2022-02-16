@@ -771,12 +771,11 @@ def topn_elec(args):
         l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
         acc=[]
         best_params=[]
-
-        data_train=data_train_loop
-        data_test=data_test_loop
         for i in range(data_train.shape[1]):
             if(i==0):
-                df_train_temp, df_test_temp=createFV_individual(data_train[:,np.newaxis,i,:], data_test[:,np.newaxis,i,:], 1000, l_feat, False)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_test_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
+            if(i==1):
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,topn[0,1],:], data_train_loop[test_index,topn[0,1],:], 1000, l_feat, True)
             else:
                 df_train_temp, df_test_temp=createFV_individual(data_train[:,topn[0:i],:], data_test[:,topn[0:i],:], 1000, l_feat, True)
             # Without feature selection check auuracy with Random forest
@@ -935,10 +934,12 @@ def topn_elec(args):
 
         for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
             for i in range(data_train_loop.shape[1]):
-                data_train=data_train_loop[train_index]
-                data_test=data_train_loop[test_index]
+           
                 if(i==0):
-                    df_train_temp, df_test_temp=createFV_individual(data_train[:,np.newaxis,i,:], data_test[:,np.newaxis,i,:], 1000, l_feat, False)
+                    df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_test_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
+                if(i==1):
+                    df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,topn[0,1],:], data_train_loop[test_index,topn[0,1],:], 1000, l_feat, True)
+                
                 else:
                     df_train_temp, df_test_temp=createFV_individual(data_train[:,topn[0:i],:], data_test[:,topn[0:i],:], 1000, l_feat, True)
                 # Without feature selection check auuracy with Random forest
