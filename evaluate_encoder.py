@@ -453,11 +453,11 @@ def individual(args):
         labels_test_loop=label_data_test[str(args.tstep)]
 
         acc={}
-        best_params={}
+        best_params_ie={}
         for k in range(data_train_loop.shape[1]):
             acc[str(k)]=[]
         for k in range(data_train_loop.shape[1]):
-            best_params[str(k)]=[]
+            best_params_ie[str(k)]=[]
 
         for i in range(data_train_loop.shape[1]):
                 df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:], 1000, l_feat, False)
