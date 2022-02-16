@@ -845,6 +845,7 @@ def topn_elec(args):
         # Without feature selection check auuracy with Random forest
 
         importances = clf.feature_importances_
+        print(importances)
 
         n_electrodes=data_train_loop.shape[1]
         #dictionary of features
