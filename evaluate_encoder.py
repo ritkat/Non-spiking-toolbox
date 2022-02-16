@@ -691,7 +691,7 @@ def topn_elec(args):
         '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
         df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        rf.fit(data_train_loop, labels_train_loop)
+        rf.fit(df_train.values, labels_train_loop)
         
         # Without feature selection check auuracy with Random forest
 
@@ -840,9 +840,9 @@ def topn_elec(args):
 
         rf = RandomForestClassifier()
         '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)'''
-        rf.fit(data_train_loop, labels_train_loop)
+        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
+        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)
+        rf.fit(df_train.values, labels_train_loop)
         
         # Without feature selection check auuracy with Random forest
 
