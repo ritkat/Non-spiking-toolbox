@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
         param_values = [v for v in parameters.values()]
 
-        for args.dataset,args.tstep,args.maxft,args.classifier in product(*param_values):
+        for args.dataset,args.tstep,args.max_feat,args.classifier in product(*param_values):
             accd, gen, self, nfeat, sd, genstd, params=genetic(args)
             for n in range(args.gen+1):
                 df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "accuracy std":sd,"generation":n, "max_features":args.max_feat,"gen accuracy":gen[str(n)],"gen std":genstd[str(n)],"selected features":self,"nfeatures":nfeat, "params":params},ignore_index=True)
