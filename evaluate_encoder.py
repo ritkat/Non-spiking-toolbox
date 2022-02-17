@@ -901,9 +901,6 @@ def topn_elec(args):
         final_df["main"]=np.arange(data_train_loop.shape[1])
         temp_df=final_df.sort_values(by='Importances', ascending=False)
         topn=temp_df.values[:,2]
-        topn=topn.tolist()
-        for i in range(0, len(topn)):
-          topn[i] = int(topn[i])
         print("topn electrodes :",topn)
         #print("topn electrodes datatype :", topn.dtype)
 
@@ -928,10 +925,13 @@ def topn_elec(args):
             sd[str(i)]=[]
 
         for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
+            data_train=data_train_loop[train_index]
+            data_test=data_train_loop[test_index]
             for i in range(data_train_loop.shape[1]):
+              
            
                 if(i==0):
-                    df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_test_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
+                    df_train_temp, df_test_temp=createFV_individual(data_train[:,np.newaxis,i,:], data_test[:,np.newaxis,i,:], 1000, l_feat, False)
                 
                 else:
                     df_train_temp, df_test_temp=createFV_individual(data_train[:,list(topn[0:i+1]),:], data_test[:,list(topn[0:i+1]),:], 1000, l_feat, True)
