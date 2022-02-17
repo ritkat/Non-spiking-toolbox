@@ -753,9 +753,6 @@ def topn_elec(args):
         final_df["main"]=np.arange(data_train_loop.shape[1])
         temp_df=final_df.sort_values(by='Importances', ascending=False)
         topn=temp_df.values[:,2]
-        topn=topn.tolist()
-        for i in range(0, len(topn)):
-          topn[i] = int(topn[i])
         print("topn electrodes :",topn)
         #print("topn electrodes datatype :", topn.dtype)
 
@@ -773,11 +770,9 @@ def topn_elec(args):
         best_params=[]
         for i in range(data_train.shape[1]):
             if(i==0):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_test_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
-            if(i==1):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,topn[0,1],:], data_train_loop[test_index,topn[0,1],:], 1000, l_feat, True)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:], 1000, l_feat, False) 
             else:
-                df_train_temp, df_test_temp=createFV_individual(data_train[:,topn[0:i],:], data_test[:,topn[0:i],:], 1000, l_feat, True)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,list(topn[0:i+1]),:], data_test_loop[:,list(topn[0:i+1]),:], 1000, l_feat, True)
             # Without feature selection check auuracy with Random forest
             if(args.classifier=="RF"):
                 rf = RandomForestClassifier()
@@ -937,11 +932,9 @@ def topn_elec(args):
            
                 if(i==0):
                     df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_test_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
-                if(i==1):
-                    df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,topn[0,1],:], data_train_loop[test_index,topn[0,1],:], 1000, l_feat, True)
                 
                 else:
-                    df_train_temp, df_test_temp=createFV_individual(data_train[:,topn[0:i],:], data_test[:,topn[0:i],:], 1000, l_feat, True)
+                    df_train_temp, df_test_temp=createFV_individual(data_train[:,list(topn[0:i+1]),:], data_test[:,list(topn[0:i+1]),:], 1000, l_feat, True)
                 # Without feature selection check auuracy with Random forest
                 if(args.classifier=="RF"):
                     rf = RandomForestClassifier()
