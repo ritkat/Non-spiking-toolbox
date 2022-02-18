@@ -133,7 +133,7 @@ def genetic(args):
     crossover_independent_proba=0.5,
     mutation_independent_proba=0.05,
     tournament_size=3,
-    n_gen_no_change=50,
+    n_gen_no_change=None,
     caching=True,
     n_jobs=-1,)
     selector = selector.fit(df_train_temp.values, labels_train_loop)
@@ -228,7 +228,7 @@ def genetic(args):
         crossover_independent_proba=0.5,
         mutation_independent_proba=0.05,
         tournament_size=3,
-        n_gen_no_change=10,
+        n_gen_no_change=None,
         caching=True,
         n_jobs=-1,)
         selector = selector.fit(df_train_temp.values, labels_train_loop[train_index])
