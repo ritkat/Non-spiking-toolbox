@@ -1,0 +1,17 @@
+scp -r ..\Non-spiking-toolbox ng1998@narval.computecanada.ca:Non-spiking-toolbox  
+source env/bin/activate
+pip install sklearn-genetic
+scp -r narval:ecog_results_features .
+
+
+scp -r ..\Feature-Extraction-Toolbox\data\bci3_epochs.npz ng1998@narval.computecanada.ca:Feature-Extraction-Toolbox/data
+
+scp -r narval:ecog_results_features .
+
+sbatch cc_ecog_baseline.sh
+watch -n 1 sq
+all_combinations = product(*param_values)
+        iterator = islice(all_combinations, args.run, args.run+1)
+        args.dataset,args.tstep, args.classifier = next(iterator)
+
+        accd,sd,best_params=baseline(args)

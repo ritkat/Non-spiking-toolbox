@@ -133,9 +133,9 @@ def genetic(args):
     crossover_independent_proba=0.5,
     mutation_independent_proba=0.05,
     tournament_size=3,
-    n_gen_no_change=10,
+    n_gen_no_change=50,
     caching=True,
-    n_jobs=100,)
+    n_jobs=-1,)
     selector = selector.fit(df_train_temp.values, labels_train_loop)
     params=selector.estimator_
     tempo=np.where(selector.support_.astype(int)==1)[0]
@@ -189,7 +189,7 @@ def genetic(args):
     segment_length=[500,1000,1500,3000]
 
 
-    kf3 = KFold(n_splits=3, shuffle=False)
+    kf3 = KFold(n_splits=5, shuffle=False)
     #accd={}
 
     #print("iteration "+str(i))
@@ -230,7 +230,7 @@ def genetic(args):
         tournament_size=3,
         n_gen_no_change=10,
         caching=True,
-        n_jobs=100,)
+        n_jobs=-1,)
         selector = selector.fit(df_train_temp.values, labels_train_loop[train_index])
         params=selector.estimator_
         tempo=np.where(selector.support_.astype(int)==1)[0]
@@ -314,12 +314,12 @@ def baseline(args):
     # Without feature selection check accuracy with Random forest
     if(args.classifier=="RF"):
         rf = RandomForestClassifier()
-        distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+        distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
     elif(args.classifier=="SVM"):
         svma=svm.SVC()
         distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-        clf = RandomizedSearchCV(svma, distributions, random_state=0)
+        clf = RandomizedSearchCV(svma, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
     clf.fit(df_train_temp.values, labels_train_loop)
     best_params=clf.best_params_
     pred = clf.predict(df_test_temp.values)
@@ -361,7 +361,7 @@ def baseline(args):
     segment_length=[500,1000,1500,3000]
 
 
-    kf3 = StratifiedKFold(n_splits=3, shuffle=False)
+    kf3 = StratifiedKFold(n_splits=5, shuffle=False)
     #accd={}
 
     #print("iteration "+str(i))
@@ -378,12 +378,12 @@ def baseline(args):
         # Without feature selection check accuracy with Random forest
         if(args.classifier=="RF"):
             rf = RandomForestClassifier()
-            distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+            distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
             clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
         elif(args.classifier=="SVM"):
             svma=svm.SVC()
             distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-            clf = RandomizedSearchCV(svma, distributions, random_state=0)
+            clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
         clf.fit(df_train_temp.values, labels_train_loop[train_index])
         best_params=clf.best_params_
         pred = clf.predict(df_test_temp.values)
@@ -465,12 +465,12 @@ def individual(args):
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
                     rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
                     svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0)
+                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop)
                 best_params_ie[str(i)].append(clf.best_params_)
                 predictions = clf.predict(df_test_temp.values)
@@ -491,12 +491,12 @@ def individual(args):
             print(np.amin(df_train_temp.values))
             if(args.classifier=="RF"):
                 rf = RandomForestClassifier()
-                distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             elif(args.classifier=="SVM"):
                 svma=svm.SVC()
                 distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                clf = RandomizedSearchCV(svma, distributions, random_state=0)
+                clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             clf.fit(df_train_temp.values, labels_train_loop)
             
             predictions = clf.predict(df_test_temp.values)
@@ -544,7 +544,7 @@ def individual(args):
         segment_length=[500,1000,1500,3000]
 
 
-        kf3 = StratifiedKFold(n_splits=3, shuffle=False)
+        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
         #accd={}
 
         #print("iteration "+str(i))
@@ -571,12 +571,12 @@ def individual(args):
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
                     rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
                     svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0)
+                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
                 best_params_ie[str(i)].append(clf.best_params_)
                 predictions = clf.predict(df_test_temp.values)
@@ -604,12 +604,12 @@ def individual(args):
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
                     rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
                     svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0)
+                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
                 
                 predictions = clf.predict(df_test_temp.values)
@@ -776,12 +776,12 @@ def topn_elec(args):
             # Without feature selection check auuracy with Random forest
             if(args.classifier=="RF"):
                 rf = RandomForestClassifier()
-                distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             elif(args.classifier=="SVM"):
                 svma=svm.SVC()
                 distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                clf = RandomizedSearchCV(svma, distributions, random_state=0)
+                clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             clf.fit(df_train_temp.values, labels_train_loop)
             y_pred_rf_w = clf.predict(df_test_temp.values)
             best_params.append(clf.best_params_)
@@ -826,7 +826,7 @@ def topn_elec(args):
         n_iter=args.niter
 
 
-        kf3 = StratifiedKFold(n_splits=3, shuffle=False)
+        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
         #accd={}
 
         #print("iteration "+str(i))
@@ -938,12 +938,12 @@ def topn_elec(args):
                 # Without feature selection check auuracy with Random forest
                 if(args.classifier=="RF"):
                     rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
                     svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0)
+                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
                 y_pred_rf_w = clf.predict(df_test_temp.values)
                 best_params[str(i)].append(clf.best_params_)

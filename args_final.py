@@ -27,7 +27,7 @@ def args():
         "--run", default=1, type=int, help="Dataset(BCI3)"
     )
     parser.add_argument(
-        "--niter", default=100, type=int, help="Dataset(BCI3)"
+        "--niter", default=200, type=int, help="Dataset(BCI3)"
     )
     parser.add_argument(
         "--nfeatures", default=17, type=int, help="Dataset(BCI3)"
@@ -36,7 +36,7 @@ def args():
         "--max_feat", default=int(5), help="Select None for no restriction on max_features and specify int for restricting the max features"
     )
     parser.add_argument(
-        "--gen", default=2, type=int, help="Dataset(BCI3)"
+        "--gen", default=20, type=int, help="Dataset(BCI3)"
     )
     
 
