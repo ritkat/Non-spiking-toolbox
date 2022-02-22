@@ -151,7 +151,7 @@ def genetic(args):
       gen[str(k)].append(selector.generation_scores_[k])
 
     self=sel
-    nfeat=len(self)
+    nfeat=len(self[0])
     accd=acc
     sd=0
     for k in range(args.gen+1):
