@@ -115,12 +115,13 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
     else:
       data_new_t=np.hstack((data_new_t, data_train_trial_t))
       
-  scaler = StandardScaler()
+  #scaler = StandardScaler()
   #param_ls=[]
   for j in tqdm(range(data_new.shape[0])):
-    scaler.fit(data_new[j,np.newaxis,:])
-    data_new[j,:]=scaler.transform(data_new[j,np.newaxis,:])
-    data_new_t[j,:]=scaler.transform(data_new_t[j,np.newaxis,:])
+    mu=np.mean(data_new[j,:])
+    sigma=np.std(data_new[j,:])
+    data_new[j,:]=(data_new[j,:]-mu)/sigma
+    data_new_t[j,:]=(data_new_t[j,np.newaxis,:])-mu)/sigma
     
   data_2_subs=np.reshape(data_new, (data_train.shape[0], data_train.shape[1], data_train.shape[2]))
   data_2_subs_t=np.reshape(data_new_t, (data_test.shape[0], data_test.shape[1], data_test.shape[2]))
