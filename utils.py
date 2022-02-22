@@ -69,15 +69,61 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         #car.shape
         for k in range(0, data_train.shape[1]):
             data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
+            
+  #subsampling by 4 
+  data_2_subs_t=data_test
+  '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
+  for i in range(0, data_test.shape[0]):
+      for j in range(0, data_test.shape[1]):
+          data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
+
+  #data_2_subs_t.shape
+  #Common Average Reference
+  if(c_ref==True):
+    for j in range(0, data_2_subs_t.shape[0]):
+        car=np.zeros((data_2_subs_t.shape[2],))
+        for i in range(0, data_2_subs_t.shape[1]):
+            car= car + data_2_subs_t[j,i,:]
+        car=car/data_2_subs_t.shape[1]
+        #car.shape
+        for k in range(0, data_2_subs_t.shape[1]):
+            data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
 
   #Standard Scaler
 
-  for j in range(0, data_train.shape[0]):
+  #Standard Scaler
+
+  '''for j in range(0, data_train.shape[0]):
       kr=data_2_subs[j,:,:]
       kr=data_2_subs[j,:,:]
       
       scaler=StandardScaler().fit(kr.T)
-      data_2_subs[j,:,:]=scaler.transform(kr.T).T
+      data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+      
+  for i in tqdm(range(data_train.shape[0])):
+    data_train_trial=data_2_subs[i,:,:]
+    if(i==0):
+      data_new=data_train_trial
+    else:
+      data_new=np.hstack((data_new, data_train_trial))
+      
+  for i in tqdm(range(data_test.shape[0])):
+    data_train_trial_t=data_2_subs_t[i,:,:]
+    if(i==0):
+      data_new_t=data_train_trial_t
+    else:
+      data_new_t=np.hstack((data_new_t, data_train_trial_t))
+      
+  scaler = StandardScaler()
+  #param_ls=[]
+  for j in tqdm(range(data_new.shape[0])):
+    scaler.fit(data_new[j,np.newaxis,:])
+    data_new[j,:]=scaler.transform(data_new[j,np.newaxis,:])
+    data_new_t[j,:]=scaler.transform(data_new_t[j,np.newaxis,:])
+    
+  data_2_subs=np.reshape(data_new, (data_train.shape[0], data_train.shape[1], data_train.shape[2]))
+  data_2_subs_t=np.reshape(data_new_t, (data_test.shape[0], data_test.shape[1], data_test.shape[2]))
+  
 
   '''#bandpass filter
   b, a = signal.butter(2, 0.4, 'low', analog=False)
@@ -215,29 +261,6 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
   final=np.hstack((final, HTFV))
   final.shape
-
-
-
-  #subsampling by 4 
-  data_2_subs_t=data_test
-  '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
-  for i in range(0, data_test.shape[0]):
-      for j in range(0, data_test.shape[1]):
-          data_2_subs_t[i, j, :]=signal.resample(data_2_sub_t[i, j, :], int(data_test.shape[2]/4))'''
-
-  #data_2_subs_t.shape
-  #Common Average Reference
-  if(c_ref==True):
-    for j in range(0, data_2_subs_t.shape[0]):
-        car=np.zeros((data_2_subs_t.shape[2],))
-        for i in range(0, data_2_subs_t.shape[1]):
-            car= car + data_2_subs_t[j,i,:]
-        car=car/data_2_subs_t.shape[1]
-        #car.shape
-        for k in range(0, data_2_subs_t.shape[1]):
-            data_2_subs_t[j,k,:]=data_2_subs_t[j,k,:]-car
-
-  #Standard Scaler
 
   for j in range(0, data_2_subs_t.shape[0]):
       kr=data_2_subs_t[j,:,:]
