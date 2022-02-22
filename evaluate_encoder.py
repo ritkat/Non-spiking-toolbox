@@ -324,6 +324,11 @@ def baseline(args):
         rf = RandomForestClassifier()
         distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
+        clf.fit(df_train_temp.values, labels_train_loop)
+        best_params=clf.best_params_
+        pred = clf.predict(df_test_temp.values)
+        acc=metrics.accuracy_score(labels_test_loop,pred)
+        sd=0
     elif(args.classifier=="SVM"):
         object=StandardScaler()
         df_train_temp = object.fit_transform(df_train_temp) 
@@ -331,11 +336,11 @@ def baseline(args):
         svma=svm.SVC()
         distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
         clf = RandomizedSearchCV(svma, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
-    clf.fit(df_train_temp.values, labels_train_loop)
-    best_params=clf.best_params_
-    pred = clf.predict(df_test_temp.values)
-    acc=metrics.accuracy_score(labels_test_loop,pred)
-    sd=0
+        clf.fit(df_train_temp, labels_train_loop)
+        best_params=clf.best_params_
+        pred = clf.predict(df_test_temp)
+        acc=metrics.accuracy_score(labels_test_loop,pred)
+        sd=0
 
     return acc,sd, best_params
 
