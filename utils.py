@@ -121,7 +121,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
     mu=np.mean(data_new[j,:])
     sigma=np.std(data_new[j,:])
     data_new[j,:]=(data_new[j,:]-mu)/sigma
-    data_new_t[j,:]=(data_new_t[j,np.newaxis,:])-mu)/sigma
+    data_new_t[j,:]=(data_new_t[j,np.newaxis,:]-mu)/sigma
     
   data_2_subs=np.reshape(data_new, (data_train.shape[0], data_train.shape[1], data_train.shape[2]))
   data_2_subs_t=np.reshape(data_new_t, (data_test.shape[0], data_test.shape[1], data_test.shape[2]))
