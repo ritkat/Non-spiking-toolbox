@@ -121,6 +121,9 @@ def genetic(args):
     if args.classifier=="RF":
       estimator = RandomForestClassifier()
     else:
+      object=StandardScaler()
+      df_train_temp = object.fit_transform(df_train_temp) 
+      df_test_temp=object.fit_transform(df_test_temp) 
       estimator=svm.SVC()
     selector = GeneticSelectionCV(
     estimator,
@@ -216,7 +219,10 @@ def genetic(args):
         if args.classifier=="RF":        
           estimator = RandomForestClassifier(n_estimators=800)
         else:
-          estimator=make_pipeline(StandardScaler(), SVC(gamma="auto"))
+          object=StandardScaler()
+          df_train_temp = object.fit_transform(df_train_temp) 
+          df_test_temp=object.fit_transform(df_test_temp) 
+          estimator=svm.SVC(gamma="auto")
         selector = GeneticSelectionCV(
         estimator,
         cv=5,
@@ -319,7 +325,10 @@ def baseline(args):
         distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
     elif(args.classifier=="SVM"):
-        svma=make_pipeline(StandardScaler(), SVC())
+        object=StandardScaler()
+        df_train_temp = object.fit_transform(df_train_temp) 
+        df_test_temp=object.fit_transform(df_test_temp) 
+        svma=svm.SVC()
         distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
         clf = RandomizedSearchCV(svma, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
     clf.fit(df_train_temp.values, labels_train_loop)
@@ -383,7 +392,10 @@ def baseline(args):
             distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
             clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
         elif(args.classifier=="SVM"):
-            svma=make_pipeline(StandardScaler(), SVC())
+            object=StandardScaler()
+            df_train_temp = object.fit_transform(df_train_temp) 
+            df_test_temp=object.fit_transform(df_test_temp) 
+            svma=svm.SVC()
             distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
             clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
         clf.fit(df_train_temp.values, labels_train_loop[train_index])
@@ -470,7 +482,10 @@ def individual(args):
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
-                    svma=make_pipeline(StandardScaler(), SVC())
+                    object=StandardScaler()
+                    df_train_temp = object.fit_transform(df_train_temp) 
+                    df_test_temp=object.fit_transform(df_test_temp) 
+                    svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop)
@@ -496,7 +511,10 @@ def individual(args):
                 distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             elif(args.classifier=="SVM"):
-                svma=make_pipeline(StandardScaler(), SVC())
+                object=StandardScaler()
+                df_train_temp = object.fit_transform(df_train_temp) 
+                df_test_temp=object.fit_transform(df_test_temp) 
+                svma=svm.SVC()
                 distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                 clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             clf.fit(df_train_temp.values, labels_train_loop)
@@ -576,7 +594,10 @@ def individual(args):
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
-                    svma=make_pipeline(StandardScaler(), SVC())
+                    object=StandardScaler()
+                    df_train_temp = object.fit_transform(df_train_temp) 
+                    df_test_temp=object.fit_transform(df_test_temp) 
+                    svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
@@ -609,6 +630,9 @@ def individual(args):
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
+                    object=StandardScaler()
+                    df_train_temp = object.fit_transform(df_train_temp) 
+                    df_test_temp=object.fit_transform(df_test_temp) 
                     svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
@@ -781,7 +805,10 @@ def topn_elec(args):
                 distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             elif(args.classifier=="SVM"):
-                svma=make_pipeline(StandardScaler(), SVC())
+                object=StandardScaler()
+                df_train_temp = object.fit_transform(df_train_temp) 
+                df_test_temp=object.fit_transform(df_test_temp) 
+                svma=svm.SVC()
                 distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                 clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
             clf.fit(df_train_temp.values, labels_train_loop)
@@ -943,7 +970,10 @@ def topn_elec(args):
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 elif(args.classifier=="SVM"):
-                    svma=make_pipeline(StandardScaler(), SVC())
+                    object=StandardScaler()
+                    df_train_temp = object.fit_transform(df_train_temp) 
+                    df_test_temp=object.fit_transform(df_test_temp) 
+                    svma=svm.SVC()
                     distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
                     clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop[train_index])
