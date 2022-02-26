@@ -238,3 +238,22 @@ if __name__ == '__main__':
             plt.tight_layout()
             plt.show()
             # logger.info('All done.')'''
+            
+    elif(args.method=="topn_feat"):
+        parameters = dict(dataset=["bci3"],
+        tstep=[500]
+        )
+        df = pd.DataFrame({"dataset":[],"tstep":[],"llim":[],"nfeatures":[]})
+        param_values = [v for v in parameters.values()]
+        for args.dataset,args.tstep in product(*param_values):
+            l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+            #args.gen=n_generations
+            args.l_feat=l_feat
+            llim, nfeatures = topn_feat(args)
+            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"llim":llim, "nfeatures":nfeatures},ignore_index=True)
+            log_file_name = 'accuracy_topn_log_'+str(args.dataset)+'.csv'
+            pwd = os.getcwd()
+            log_dir = pwd+'/log_dir/'
+            df.to_csv(log_dir+log_file_name, index=False)
+
+            df.to_csv(log_file_name, index=False)
