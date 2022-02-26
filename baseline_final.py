@@ -240,17 +240,17 @@ if __name__ == '__main__':
             # logger.info('All done.')'''
             
     elif(args.method=="topn_feat"):
-        parameters = dict(dataset=["bci3"],
-        tstep=[500]
+        parameters = dict(dataset=["bci3", "jc_mot"],
+        tstep=[3000]
         )
-        df = pd.DataFrame({"dataset":[],"tstep":[],"llim":[],"nfeatures":[]})
+        df = pd.DataFrame({"dataset":[],"tstep":[],"llim":[],"nfeatures":[], "electrodes":[]})
         param_values = [v for v in parameters.values()]
         for args.dataset,args.tstep in product(*param_values):
             l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
             #args.gen=n_generations
             args.l_feat=l_feat
-            llim, nfeatures = topn_feat(args)
-            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"llim":llim, "nfeatures":nfeatures},ignore_index=True)
+            llim, nfeatures, elec = topn_feat(args)
+            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"llim":llim, "nfeatures":nfeatures, "electrodes":elec},ignore_index=True)
             log_file_name = 'accuracy_topn_log_'+str(args.dataset)+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
