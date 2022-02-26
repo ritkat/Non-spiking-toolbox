@@ -1344,7 +1344,7 @@ def topn_feat(args):
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
         df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,  1000, l_feat, True)
         
-        return llim, nfeatures
+        return llim, nfeatures, data_train.shape[1]
       
     else:
         data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
@@ -1395,7 +1395,7 @@ def topn_feat(args):
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
         df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)
         
-        return llim, nfeatures
+        return llim, nfeatures, data_train_ib.shape[1]
 
 
 
