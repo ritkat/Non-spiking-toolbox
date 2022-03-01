@@ -199,8 +199,13 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
       for i in range(0, data_train.shape[1]):
         sd=np.std(data_trial[:,i])
         STDFV = np.append(STDFV, sd)
+        
+      CORFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        cor=nolds.corr_dim(data_trial[:,i],1)
+        CORFV = np.append(CORFV, sd)
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
