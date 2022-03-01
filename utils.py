@@ -23,6 +23,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn import svm
 import os
 import pyeeg
+import nolds
 from tqdm import tqdm
 from args_final import args as my_args
 
@@ -204,8 +205,13 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
       for i in range(0, data_train.shape[1]):
         cor=nolds.corr_dim(data_trial[:,i],1)
         CORFV = np.append(CORFV, sd)
+        
+      HJFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        hj=pyeeg.hjorth(data_trial[:,i],1)
+        HJFV = np.append(HJFV, hj)
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV,HJFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
@@ -336,6 +342,44 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           HWDFV=np.append(HWDFV, cA)
 
+      HUFV = np.array([])    
+      for i in range(0, data_2_subs_t.shape[1]):
+        hu=pyeeg.hurst(data_trial[:,i])
+        HUFV = np.append(HUFV, hu)
+      
+      PFDFV = np.array([])    
+      for i in range(0, data_2_subs_t.shape[1]):
+        pfd=pyeeg.pfd(data_trial[:,i])
+        PFDFV = np.append(PFDFV, pfd)
+      #Concatenaton of All the feature vectors
+      
+      DFAFV = np.array([])
+      for i in range(0, data_2_subs_t.shape[1]):
+        dfa=pyeeg.dfa(data_trial[:,i])
+        DFAFV = np.append(DFAFV, dfa)
+        
+      MNFV = np.array([])
+      for i in range(0, data_2_subs_t.shape[1]):
+        mn=np.mean(data_trial[:,i])
+        MNFV = np.append(MNFV, mn)
+        
+      STDFV = np.array([])
+      for i in range(0, data_2_subs_t.shape[1]):
+        sd=np.std(data_trial[:,i])
+        STDFV = np.append(STDFV, sd)
+        
+      CORFV = np.array([])
+      for i in range(0, data_2_subs_t.shape[1]):
+        cor=nolds.corr_dim(data_trial[:,i],1)
+        CORFV = np.append(CORFV, sd)
+      
+      HJFV = np.array([])
+      for i in range(0, data_2_subs_t.shape[1]):
+        hj=pyeeg.hjorth(data_trial[:,i],1)
+        HJFV = np.append(HJFV, hj)
+      
+      
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV,HJFV), axis=None)
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
@@ -439,27 +483,36 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
   final_t=np.hstack((final_t, HTFV_t))
   final_t.shape
+  
+  ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV,HJFV
 
   #importance per feature
   nfeatures_1=ARFV.shape[0]
   nfeatures_2=HWDFV.shape[0]
   nfeatures_3=SPFV.shape[0]
+  nfeatures_4=HUFV.shape[0]
+  nfeatures_5=PFDFV.shape[0]
+  nfeatures_6=DFAFV.shape[0]
+  nfeatures_7=MNFV.shape[0]
+  nfeatures_8=STDFV.shape[0]
+  nfeatures_9=CORFV.shape[0]
+  nfeatures_10=HJFV.shape[0]
 
   #EEG EXTRACT FEATURES
-  nfeatures_4=ShannonRes_delta.shape[0]
-  nfeatures_5=ShannonRes_theta.shape[0]
-  nfeatures_6=ShannonRes_alpha.shape[0]
-  nfeatures_7=ShannonRes_beta.shape[0]
-  nfeatures_8=ShannonRes_gamma.shape[0]
-  nfeatures_9=HjorthMob.shape[0]
-  nfeatures_10=HjorthComp.shape[0]
-  nfeatures_11=medianFreqRes.shape[0]
-  nfeatures_12=std_res.shape[0]
-  nfeatures_13=regularity_res.shape[0]
-  nfeatures_14=spikeNum_res.shape[0]
-  nfeatures_15=sharpSpike_res.shape[0]
-  nfeatures_16=bandPwr_gamma.shape[0]
-  nfeatures_17=HTFV_temp.shape[0]
+  nfeatures_11=ShannonRes_delta.shape[0]
+  nfeatures_12=ShannonRes_theta.shape[0]
+  nfeatures_13=ShannonRes_alpha.shape[0]
+  nfeatures_14=ShannonRes_beta.shape[0]
+  nfeatures_15=ShannonRes_gamma.shape[0]
+  nfeatures_16=HjorthMob.shape[0]
+  nfeatures_17=HjorthComp.shape[0]
+  nfeatures_18=medianFreqRes.shape[0]
+  nfeatures_19=std_res.shape[0]
+  nfeatures_20=regularity_res.shape[0]
+  nfeatures_21=spikeNum_res.shape[0]
+  nfeatures_22=sharpSpike_res.shape[0]
+  nfeatures_23=bandPwr_gamma.shape[0]
+  nfeatures_24=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
   nfeatures_18=bandPwr_gamma.shape[0]
@@ -483,13 +536,18 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
   llim16=llim15+nfeatures_15
   llim17=llim16+nfeatures_16
   llim18=llim17+nfeatures_17
-  '''llim17=llim16+nfeatures_16
+  llim17=llim16+nfeatures_16
   llim18=llim17+nfeatures_17
   llim19=llim18+nfeatures_18
-  llim20=llim19+nfeatures_19'''
+  llim20=llim19+nfeatures_19
+  llim21=llim20+nfeatures_20
+  llim22=llim21+nfeatures_21
+  llim23=llim22+nfeatures_22
+  llim24=llim23+nfeatures_23
+  llim25=llim24+nfeatures_24
 
-  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18]
-  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17]
+  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24]
+  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24]
 
   for i, lf in enumerate(l_feat):
     print("trial"+str(lf))
