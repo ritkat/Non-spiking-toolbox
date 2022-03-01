@@ -543,7 +543,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
   llim22=llim21+nfeatures_21
   llim23=llim22+nfeatures_22
   llim24=llim23+nfeatures_23
-  llim25=llim24+nfeatures_24
+  #llim25=llim24+nfeatures_24
 
   llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24]
   nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24]
