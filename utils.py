@@ -172,15 +172,19 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           f2, Pxx_den2 = signal.welch(data_trial_s2[:,i], int(data_2_subs.shape[2]/3))
           f3, Pxx_den3 = signal.welch(data_trial_s3[:,i], int(data_2_subs.shape[2]/3))
           SPFV=np.append(SPFV, (Pxx_den1, Pxx_den2, Pxx_den3))
+          
+      for i in range(0, data_train.shape[1]):
+        HUFV = pyeeg.hurst(data_trial[:,i])
 
       #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV, HWDFV, SPFV), axis=None)
+      concated=np.concatenate((ARFV, HWDFV, SPFV, HUFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
       else:
           final= np.hstack((final, concated))
       print(j)
+  print("THE NEW FEATURES")
   print(final.shape)
 
   final=final.T
