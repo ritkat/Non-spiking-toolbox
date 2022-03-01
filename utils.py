@@ -22,6 +22,7 @@ import seaborn as sns
 from sklearn.model_selection import StratifiedKFold
 from sklearn import svm
 import os
+import pyeeg
 from tqdm import tqdm
 from args_final import args as my_args
 
