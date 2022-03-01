@@ -184,7 +184,23 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         pfd=pyeeg.pfd(data_trial[:,i])
         PFDFV = np.append(PFDFV, pfd)
       #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV, HWDFV, SPFV, HUFV,PFDFV), axis=None)
+      
+      DFAFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        dfa=pyeeg.dfa(data_trial[:,i])
+        DFAFV = np.append(DFAFV, dfa)
+        
+      MNFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        mn=np.mean(data_trial[:,i])
+        MNFV = np.append(MNFV, mn)
+        
+      STDFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        sd=np.std(data_trial[:,i])
+        STDFV = np.append(STDFV, sd)
+      
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
