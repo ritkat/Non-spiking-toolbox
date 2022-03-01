@@ -206,12 +206,12 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         cor=nolds.corr_dim(data_trial[:,i],1)
         CORFV = np.append(CORFV, sd)
         
-      HJFV = np.array([])
+      '''HJFV = np.array([])
       for i in range(0, data_train.shape[1]):
         hj=pyeeg.hjorth(data_trial[:,i],1)
-        HJFV = np.append(HJFV, hj)
+        HJFV = np.append(HJFV, hj)'''
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV,HJFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
@@ -373,13 +373,13 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         cor=nolds.corr_dim(data_trial[:,i],1)
         CORFV = np.append(CORFV, sd)
       
-      HJFV = np.array([])
+      '''HJFV = np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
         hj=pyeeg.hjorth(data_trial[:,i],1)
-        HJFV = np.append(HJFV, hj)
+        HJFV = np.append(HJFV, hj)'''
       
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV,HJFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV), axis=None)
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
@@ -496,23 +496,22 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
   nfeatures_7=MNFV.shape[0]
   nfeatures_8=STDFV.shape[0]
   nfeatures_9=CORFV.shape[0]
-  nfeatures_10=HJFV.shape[0]
 
   #EEG EXTRACT FEATURES
-  nfeatures_11=ShannonRes_delta.shape[0]
-  nfeatures_12=ShannonRes_theta.shape[0]
-  nfeatures_13=ShannonRes_alpha.shape[0]
-  nfeatures_14=ShannonRes_beta.shape[0]
-  nfeatures_15=ShannonRes_gamma.shape[0]
-  nfeatures_16=HjorthMob.shape[0]
-  nfeatures_17=HjorthComp.shape[0]
-  nfeatures_18=medianFreqRes.shape[0]
-  nfeatures_19=std_res.shape[0]
-  nfeatures_20=regularity_res.shape[0]
-  nfeatures_21=spikeNum_res.shape[0]
-  nfeatures_22=sharpSpike_res.shape[0]
-  nfeatures_23=bandPwr_gamma.shape[0]
-  nfeatures_24=HTFV_temp.shape[0]
+  nfeatures_10=ShannonRes_delta.shape[0]
+  nfeatures_11=ShannonRes_theta.shape[0]
+  nfeatures_12=ShannonRes_alpha.shape[0]
+  nfeatures_13=ShannonRes_beta.shape[0]
+  nfeatures_14=ShannonRes_gamma.shape[0]
+  nfeatures_15=HjorthMob.shape[0]
+  nfeatures_16=HjorthComp.shape[0]
+  nfeatures_17=medianFreqRes.shape[0]
+  nfeatures_18=std_res.shape[0]
+  nfeatures_19=regularity_res.shape[0]
+  nfeatures_20=spikeNum_res.shape[0]
+  nfeatures_21=sharpSpike_res.shape[0]
+  nfeatures_22=bandPwr_gamma.shape[0]
+  nfeatures_23=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
   nfeatures_18=bandPwr_gamma.shape[0]
