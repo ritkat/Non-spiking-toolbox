@@ -483,8 +483,6 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
   final_t=np.hstack((final_t, HTFV_t))
   final_t.shape
-  
-  ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV,HJFV
 
   #importance per feature
   nfeatures_1=ARFV.shape[0]
