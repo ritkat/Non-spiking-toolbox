@@ -379,7 +379,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         HJFV = np.append(HJFV, hj)'''
       
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV), axis=None)
+      
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
@@ -389,7 +389,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           SPFV=np.append(SPFV, (Pxx_den1, Pxx_den2, Pxx_den3))
 
       #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV, HWDFV, SPFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,HUFV,PFDFV,DFAFV,MNFV,STDFV,CORFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final_t=concated
@@ -544,7 +544,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
   #llim25=llim24+nfeatures_24
 
   llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24]
-  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24]
+  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23]
 
   for i, lf in enumerate(l_feat):
     print("trial"+str(lf))
