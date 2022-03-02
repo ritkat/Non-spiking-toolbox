@@ -25,6 +25,7 @@ import os
 import pyeeg
 import nolds
 from tqdm import tqdm
+from tqdm.notebook import tqdm
 from args_final import args as my_args
 
 args=my_args()
