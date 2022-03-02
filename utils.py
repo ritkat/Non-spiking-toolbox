@@ -103,32 +103,37 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
       scaler=StandardScaler().fit(kr.T)
       data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
       
-  for i in tqdm(range(data_train.shape[0])):
-    data_train_trial=data_2_subs[i,:,:]
-    if(i==0):
-      data_new=data_train_trial
-    else:
-      data_new=np.hstack((data_new, data_train_trial))
+
       
-  for i in tqdm(range(data_test.shape[0])):
-    data_train_trial_t=data_2_subs_t[i,:,:]
-    if(i==0):
-      data_new_t=data_train_trial_t
-    else:
-      data_new_t=np.hstack((data_new_t, data_train_trial_t))
       
   #scaler = StandardScaler()
   #param_ls=[]
-  for j in tqdm(range(data_new.shape[0])):
-    mu=np.mean(data_new[j,:])
-    sigma=np.std(data_new[j,:])
-    data_new[j,:]=(data_new[j,:]-mu)/sigma
-    data_new_t[j,:]=(data_new_t[j,np.newaxis,:]-mu)/sigma
+  mu_l={}
+  std_l={}
+  for j in range(data_2_subs.shape[1]):
+    mu_l[str(j)]=[]
+    std_l[str(j)]=[]
     
-  data_2_subs=np.reshape(data_new, (data_train.shape[0], data_train.shape[1], data_train.shape[2]))
-  data_2_subs_t=np.reshape(data_new_t, (data_test.shape[0], data_test.shape[1], data_test.shape[2]))
+  for i in range(data_2_subs.shape[0]):
+    for j in range(data_2_subs.shape[1]):
+      mu=np.mean(data_2_subs[i,j,:])
+      std=np.std(data_2_subs[i,j,:])
+      mu_l[str(j)].append(mu)
+      std_l[str(j)].append(std)
   
-
+  for j in range(data_2_subs.shape[1]):
+    mu_l[str(j)]=sum(mu_l[str(j)])/len(mu_l[str(j)])
+    std_l[str(j)]=sum(std_l[str(j)])/len(std_l[str(j)])
+    
+  for i in range(data_2_subs.shape[0]):
+    for j in range(data_2_subs.shape[1]):
+      data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)]))/std_l[str(j)]
+      
+  for i in range(data_2_subs_t.shape[0]):
+    for j in range(data_2_subs_t.shape[1]):
+      data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)]))/std_l[str(j)]
+    
+     
   '''#bandpass filter
   b, a = signal.butter(2, 0.4, 'low', analog=False)
   data_2_subs = signal.filtfilt(b, a, data_2_subs, axis=2)'''
