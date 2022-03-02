@@ -24,11 +24,16 @@ from sklearn import svm
 import os
 import pyeeg
 import nolds
+from pywt import wavedec
 from tqdm import tqdm
 from tqdm.notebook import tqdm
 from args_final import args as my_args
 
 args=my_args()
+
+def autocorr(x):
+  result = np.correlate(x, x, mode='full')
+  return result[result.size//2:]
 
 def segment(data_trial, segment_length=500):
   data_final=np.array([])
@@ -170,7 +175,13 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
       HWDFV=np.array([])
       for i in range(0, data_train.shape[1]):
-          (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          coeffs = wavedec(data_trial[:,i], 'haar',level=6)
+          cA6,cD6,cD5,cD4,cD3, cD2, cD1=coeffs
+          cD6_a=autocorr(cD6)
+          cD5_a=autocorr(cD5)
+          cD4_a=autocorr(cD4)
+          cA=[np.var(cD1),np.var(cD2),np.var(cD3),np.var(cD4_a),np.var(cD5_a),np.var(cD6_a)]
           HWDFV=np.append(HWDFV, cA)
 
       #Spectral Power estimates
@@ -345,7 +356,13 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
       HWDFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-          (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          coeffs = wavedec(data_trial[:,i], 'haar',level=6)
+          cA6,cD6,cD5,cD4,cD3, cD2, cD1=coeffs
+          cD6_a=autocorr(cD6)
+          cD5_a=autocorr(cD5)
+          cD4_a=autocorr(cD4)
+          cA=[np.var(cD1),np.var(cD2),np.var(cD3),np.var(cD4_a),np.var(cD5_a),np.var(cD6_a)]
           HWDFV=np.append(HWDFV, cA)
 
       HUFV = np.array([])    
