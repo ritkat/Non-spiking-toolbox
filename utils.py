@@ -612,14 +612,29 @@ def createFV_individual_feat(data_train, fs, l_feat, c_ref):
             data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
 
   #Standard Scaler
-
-  for j in range(0, data_train.shape[0]):
-      kr=data_2_subs[j,:,:]
-      kr=data_2_subs[j,:,:]
       
-      scaler=StandardScaler().fit(kr.T)
-      data_2_subs[j,:,:]=scaler.transform(kr.T).T
-
+  mu_l={}
+  std_l={}
+  for j in range(data_2_subs.shape[1]):
+    mu_l[str(j)]=[]
+    std_l[str(j)]=[]
+    
+  for i in range(data_2_subs.shape[0]):
+    for j in range(data_2_subs.shape[1]):
+      mu=np.mean(data_2_subs[i,j,:])
+      std=np.std(data_2_subs[i,j,:])
+      mu_l[str(j)].append(mu)
+      std_l[str(j)].append(std)
+  
+  for j in range(data_2_subs.shape[1]):
+    mu_l[str(j)]=sum(mu_l[str(j)])/len(mu_l[str(j)])
+    std_l[str(j)]=sum(std_l[str(j)])/len(std_l[str(j)])
+    
+  for i in range(data_2_subs.shape[0]):
+    for j in range(data_2_subs.shape[1]):
+      data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
+      
+         
   '''#bandpass filter
   b, a = signal.butter(2, 0.4, 'low', analog=False)
   data_2_subs = signal.filtfilt(b, a, data_2_subs, axis=2)'''
@@ -655,8 +670,43 @@ def createFV_individual_feat(data_train, fs, l_feat, c_ref):
 
       HWDFV=np.array([])
       for i in range(0, data_train.shape[1]):
-          (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          coeffs = wavedec(data_trial[:,i], 'haar',level=6)
+          cA6,cD6,cD5,cD4,cD3, cD2, cD1=coeffs
+          cD6_a=autocorr(cD6)
+          cD5_a=autocorr(cD5)
+          cD4_a=autocorr(cD4)
+          cA=[np.var(cD1),np.var(cD2),np.var(cD3),np.var(cD4_a),np.var(cD5_a),np.var(cD6_a)]
           HWDFV=np.append(HWDFV, cA)
+
+      
+      PFDFV = np.array([])    
+      for i in range(0, data_train.shape[1]):
+        pfd=pyeeg.pfd(data_trial[:,i])
+        PFDFV = np.append(PFDFV, pfd)
+      #Concatenaton of All the feature vectors
+      
+      DFAFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        dfa=pyeeg.dfa(data_trial[:,i])
+        DFAFV = np.append(DFAFV, dfa)
+        
+      MNFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        mn=np.mean(data_trial[:,i])
+        MNFV = np.append(MNFV, mn)
+        
+      STDFV = np.array([])
+      for i in range(0, data_train.shape[1]):
+        sd=np.std(data_trial[:,i])
+        STDFV = np.append(STDFV, sd)
+        
+      
+      '''HJFV = np.array([])
+      for i in range(0, data_2_subs_t.shape[1]):
+        hj=pyeeg.hjorth(data_trial[:,i],1)
+        HJFV = np.append(HJFV, hj)'''
+      
 
       #Spectral Power estimates
       SPFV=np.array([])
@@ -667,7 +717,7 @@ def createFV_individual_feat(data_train, fs, l_feat, c_ref):
           SPFV=np.append(SPFV, (Pxx_den1, Pxx_den2, Pxx_den3))
 
       #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV, HWDFV, SPFV), axis=None)
+      concated=np.concatenate((ARFV, HWDFV, SPFV, PFDFV, DFAFV, STDFV, MNFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
@@ -765,22 +815,28 @@ def createFV_individual_feat(data_train, fs, l_feat, c_ref):
   nfeatures_1=ARFV.shape[0]
   nfeatures_2=HWDFV.shape[0]
   nfeatures_3=SPFV.shape[0]
+  #nfeatures_4=HUFV.shape[0]
+  nfeatures_4=PFDFV.shape[0]
+  nfeatures_5=DFAFV.shape[0]
+  nfeatures_6=MNFV.shape[0]
+  nfeatures_7=STDFV.shape[0]
+  #nfeatures_9=CORFV.shape[0]
 
   #EEG EXTRACT FEATURES
-  nfeatures_4=ShannonRes_delta.shape[0]
-  nfeatures_5=ShannonRes_theta.shape[0]
-  nfeatures_6=ShannonRes_alpha.shape[0]
-  nfeatures_7=ShannonRes_beta.shape[0]
-  nfeatures_8=ShannonRes_gamma.shape[0]
-  nfeatures_9=HjorthMob.shape[0]
-  nfeatures_10=HjorthComp.shape[0]
-  nfeatures_11=medianFreqRes.shape[0]
-  nfeatures_12=std_res.shape[0]
-  nfeatures_13=regularity_res.shape[0]
-  nfeatures_14=spikeNum_res.shape[0]
-  nfeatures_15=sharpSpike_res.shape[0]
-  nfeatures_16=bandPwr_gamma.shape[0]
-  nfeatures_17=HTFV_temp.shape[0]
+  nfeatures_8=ShannonRes_delta.shape[0]
+  nfeatures_9=ShannonRes_theta.shape[0]
+  nfeatures_10=ShannonRes_alpha.shape[0]
+  nfeatures_11=ShannonRes_beta.shape[0]
+  nfeatures_12=ShannonRes_gamma.shape[0]
+  nfeatures_13=HjorthMob.shape[0]
+  nfeatures_14=HjorthComp.shape[0]
+  nfeatures_15=medianFreqRes.shape[0]
+  nfeatures_16=std_res.shape[0]
+  nfeatures_17=regularity_res.shape[0]
+  nfeatures_18=spikeNum_res.shape[0]
+  nfeatures_19=sharpSpike_res.shape[0]
+  nfeatures_20=bandPwr_gamma.shape[0]
+  nfeatures_21=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
   nfeatures_18=bandPwr_gamma.shape[0]
@@ -804,13 +860,18 @@ def createFV_individual_feat(data_train, fs, l_feat, c_ref):
   llim16=llim15+nfeatures_15
   llim17=llim16+nfeatures_16
   llim18=llim17+nfeatures_17
-  '''llim17=llim16+nfeatures_16
+  llim17=llim16+nfeatures_16
   llim18=llim17+nfeatures_17
   llim19=llim18+nfeatures_18
-  llim20=llim19+nfeatures_19'''
+  llim20=llim19+nfeatures_19
+  llim21=llim20+nfeatures_20
+  llim22=llim21+nfeatures_21
+  #llim23=llim22+nfeatures_22
+  #llim24=llim23+nfeatures_23
+  #llim25=llim24+nfeatures_24
 
-  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18]
-  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17]
+  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22]
+  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21]
 
   for i, lf in enumerate(l_feat):
     print("trial"+str(lf))
