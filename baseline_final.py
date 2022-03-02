@@ -32,7 +32,7 @@ if __name__ == '__main__':
         )
 
         n_generations=2
-        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         args.gen=n_generations
         args.l_feat=l_feat
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         )
 
         n_generations=10
-        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         #args.gen=n_generations
         args.l_feat=l_feat
         args.niter=200
@@ -174,7 +174,7 @@ if __name__ == '__main__':
         )
 
         n_generations=10
-        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         #args.gen=n_generations
         args.l_feat=l_feat
         args.niter=200
@@ -211,7 +211,7 @@ if __name__ == '__main__':
         )
 
         n_generations=10
-        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         #args.gen=n_generations
         args.l_feat=l_feat
         args.niter=200
@@ -246,7 +246,7 @@ if __name__ == '__main__':
         df = pd.DataFrame({"dataset":[],"tstep":[],"llim":[],"nfeatures":[], "electrodes":[]})
         param_values = [v for v in parameters.values()]
         for args.dataset,args.tstep in product(*param_values):
-            l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+            l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
             #args.gen=n_generations
             args.l_feat=l_feat
             llim, nfeatures, elec = topn_feat(args)
