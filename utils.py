@@ -127,11 +127,11 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
     
   for i in range(data_2_subs.shape[0]):
     for j in range(data_2_subs.shape[1]):
-      data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)]))/std_l[str(j)]
+      data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
       
   for i in range(data_2_subs_t.shape[0]):
     for j in range(data_2_subs_t.shape[1]):
-      data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)]))/std_l[str(j)]
+      data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
     
      
   '''#bandpass filter
