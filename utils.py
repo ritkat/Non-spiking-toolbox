@@ -94,6 +94,13 @@ def freq_atmax(expo):
   ret=f[ind]
   return ret[0]
 
+def max_psd(expo):
+  f, Pxx_den = signal.periodogram(expo, fs=1000)
+  ret=np.amax(Pxx_den)
+
+  return ret
+
+
 
 def segment(data_trial, segment_length=500):
   data_final=np.array([])
@@ -320,9 +327,14 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           f = freq_atmax(data_trial[:,i])
           FAMFV = np.append(FAMFV, f)
           
+      MPSFV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = max_psd(data_trial[:,i])
+          MPSFV = np.append(MPSFV, f)
           
           
-        
+          
       '''CORFV = np.array([])
       for i in range(0, data_train.shape[1]):
         cor=nolds.corr_dim(data_trial[:,i],1)
