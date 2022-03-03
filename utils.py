@@ -87,6 +87,12 @@ def mean_freq(expo):
   ret=sum/np.sum(Pxx_den)
   return ret
 
+def freq_atmax(expo):
+  f, Pxx_den = signal.periodogram(expo, fs=1000)
+  sum=0
+  ind=np.where(Pxx_den==np.amax(Pxx_den))[0]
+  ret=f[ind]
+  return ret[0]
 
 
 def segment(data_trial, segment_length=500):
@@ -235,7 +241,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           cD6_a=autocorr(cD6)
           cD5_a=autocorr(cD5)
           cD4_a=autocorr(cD4)
-          cA=[np.var(cD1),np.var(cD2),np.var(cD3),np.var(cD4_a),np.var(cD5_a),np.var(cD6_a)]
+          cA=[np.var(cD1),np.var(cD2),np.var(cD3),np.var(cD4_a),np.var(cD5_a),np.var(cD6_a), np.mean(np.absolute(cD1)), np.mean(np.absolute(cD2)), np.mean(np.absolute(cD3))]
           HWDFV=np.append(HWDFV, cA)
 
       #Spectral Power estimates
@@ -308,6 +314,12 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           f = mean_freq(data_trial[:,i])
           MFQFV = np.append(MFQFV, f)
           
+      FAMFV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = freq_atmax(data_trial[:,i])
+          FAMFV = np.append(FAMFV, f)
+          
           
           
         
@@ -321,7 +333,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         hj=pyeeg.hjorth(data_trial[:,i],1)
         HJFV = np.append(HJFV, hj)'''
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
