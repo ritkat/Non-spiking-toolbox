@@ -35,6 +35,18 @@ def autocorr(x):
   result = np.correlate(x, x, mode='full')
   return result[result.size//2:]
 
+def mean1(exp):
+  N=len(exp)
+  sum=0
+  for i in range(N):
+    if i <= 0.75*N and i >= 0.25*N:
+        w = 1
+    else:
+      w = 0.5
+    sum=sum+w*exp[i]
+  f=sum/N
+  return f
+
 def segment(data_trial, segment_length=500):
   data_final=np.array([])
   for i in range(0, data_trial.shape[0]):
@@ -218,6 +230,20 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         sd=np.std(data_trial[:,i])
         STDFV = np.append(STDFV, sd)
         
+      MT1FV=np.array([])
+      for i in range(0, data_train.shape[1]):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = mean1(data_trial[:,i])
+          MT1FV = np.append(MT1FV, f)
+          
+      MT2FV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = mean2(data_trial[:,i])
+          MT2FV = np.append(MT2FV, f)
+      
+          
+        
       '''CORFV = np.array([])
       for i in range(0, data_train.shape[1]):
         cor=nolds.corr_dim(data_trial[:,i],1)
@@ -228,7 +254,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         hj=pyeeg.hjorth(data_trial[:,i],1)
         HJFV = np.append(HJFV, hj)'''
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
