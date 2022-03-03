@@ -784,7 +784,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
   nfeatures_34=spikeNum_res.shape[0]
   nfeatures_35=sharpSpike_res.shape[0]
   nfeatures_36=bandPwr_gamma.shape[0]
-  nfeatures_37=HTFV_temp.shape[0]
+  #nfeatures_37=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
   nfeatures_18=bandPwr_gamma.shape[0]
