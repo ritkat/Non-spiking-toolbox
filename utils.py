@@ -35,17 +35,41 @@ def autocorr(x):
   result = np.correlate(x, x, mode='full')
   return result[result.size//2:]
 
-def mean1(exp):
-  N=len(exp)
+def mean1(expo):
+  N=len(expo)
   sum=0
   for i in range(N):
     if i <= 0.75*N and i >= 0.25*N:
         w = 1
     else:
       w = 0.5
-    sum=sum+w*exp[i]
+    sum=sum+w*np.absolute(expo[i])
   f=sum/N
   return f
+
+def mean2(expo):
+  N=len(expo)
+  sum=0
+  for i in range(N):
+    if i <= 0.75*N and i >= 0.25*N:
+      w = 1
+    elif i < 0.25*N :
+      w = 4*i/N
+    else:
+      w = 4*(N-i)/N
+    sum=sum+w*np.absolute(expo[i])
+  f=sum/N
+  return f
+
+def log_detec(expo):
+  N=len(expo)
+  sum=0
+  for i in range(N):
+    if(expo[i]==0):
+      continue
+    sum=sum+np.log(np.absolute(expo[i]))
+  f=sum/N
+  return np.exp(f)
 
 def segment(data_trial, segment_length=500):
   data_final=np.array([])
@@ -241,6 +265,12 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean2(data_trial[:,i])
           MT2FV = np.append(MT2FV, f)
+          
+      LDFV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = log_detec(data_trial[:,i])
+          LDFV = np.append(LDFV, f)
       
           
         
@@ -254,7 +284,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         hj=pyeeg.hjorth(data_trial[:,i],1)
         HJFV = np.append(HJFV, hj)'''
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
