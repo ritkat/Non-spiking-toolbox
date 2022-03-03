@@ -71,6 +71,24 @@ def log_detec(expo):
   f=sum/N
   return np.exp(f)
 
+def abs_diff(expo):
+  N=len(expo)
+  sum=0
+  for i in range(N-1):
+    sum=sum+np.absolute(expo[i+1]-expo[i])
+  f=sum/(N-1)
+  return f
+
+def mean_freq(expo):
+  f, Pxx_den = signal.periodogram(expo, fs=1000)
+  sum=0
+  for i in range(Pxx_den.shape[0]):
+    sum=sum+(f[i]*Pxx_den[i])
+  ret=sum/np.sum(Pxx_den)
+  return ret
+
+
+
 def segment(data_trial, segment_length=500):
   data_final=np.array([])
   for i in range(0, data_trial.shape[0]):
@@ -271,7 +289,26 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = log_detec(data_trial[:,i])
           LDFV = np.append(LDFV, f)
-      
+          
+      MDNFV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = np.median(np.absolute(data_trial[:,i]))
+          MDNFV = np.append(MDNFV, f)
+          
+      ABDFV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = abs_diff(data_trial[:,i])
+          ABDFV = np.append(ABDFV, f)
+          
+      MFQFV=np.array([])
+      for i in tqdm(range(0, data_train.shape[1])):
+          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          f = mean_freq(data_trial[:,i])
+          MFQFV = np.append(MFQFV, f)
+          
+          
           
         
       '''CORFV = np.array([])
@@ -284,7 +321,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
         hj=pyeeg.hjorth(data_trial[:,i],1)
         HJFV = np.append(HJFV, hj)'''
       
-      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
