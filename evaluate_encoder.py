@@ -347,7 +347,82 @@ def baseline(args):
 
     return acc,sd, best_params
 
+  elif(args.dataset=="speech"):
+    data_ib=np.load('./data/speech.npz')
+    data_train_ib = data_ib["X"]
+    labels_train_ib = data_ib["y"]
+    #500 Tstep
+    data_train_ib_500=segment(data_train_ib, segment_length=500)
+    print(np.amax(data_train_ib_500))
+    print(np.amin(data_train_ib_500))
 
+    segment_length=500
+    labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
+
+    #1000 Tstep
+    data_train_ib_1000=segment(data_train_ib, segment_length=1000)
+    segment_length=1000
+    labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
+
+    #1500 Tstep
+    data_train_ib_1500=segment(data_train_ib, segment_length=1500)
+    segment_length=1500
+    labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
+
+    #3000 Tstep
+    data_train_ib_3000=data_train_ib
+    segment_length=3000
+    labels_train_ib_3000=labels_train_ib
+
+    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
+    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
+    segment_length=[500,1000,1500,3000]
+
+
+    kf3 = StratifiedKFold(n_splits=5, shuffle=False)
+    #accd={}
+
+    #print("iteration "+str(i))
+    data_train_loop=training_data[str(args.tstep)]
+    labels_train_loop=label_data[str(args.tstep)]
+    #fs=int(segment_length[i]/3)
+    acc=[]
+    l_feat=args.l_feat 
+    n_iter=args.niter
+    for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], 3052, l_feat, True)
+        print(np.amax(df_train_temp.values))
+        print(np.amin(df_train_temp.values))
+        # Without feature selection check accuracy with Random forest
+        if(args.classifier=="RF"):
+            rf = RandomForestClassifier()
+            distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
+            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
+            clf.fit(df_train_temp.values, labels_train_loop[train_index])
+            best_params=clf.best_params_
+            pred = clf.predict(df_test_temp.values)
+            acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
+        elif(args.classifier=="SVM"):
+            object=StandardScaler()
+            object.fit(df_train_temp)
+            df_train_temp = object.transform(df_train_temp) 
+            df_test_temp=object.transform(df_test_temp) 
+            svma=svm.SVC()
+            distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
+            clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
+            clf.fit(df_train_temp, labels_train_loop[train_index])
+            best_params=clf.best_params_
+            pred = clf.predict(df_test_temp)
+            acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
+    
+    sd=np.std(acc)
+    accd=sum(acc)/len(acc)
+    
+
+    
+
+    return accd, sd, best_params
+    
   else:
     data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
     data_train_ib = data_ib["X"]
