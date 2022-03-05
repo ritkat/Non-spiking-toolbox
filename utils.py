@@ -56,6 +56,31 @@ def segment(data_trial, segment_length=500):
 
   return data_final
 
+def segment_speech(data_trial, segment_length=500):
+  data_final=np.array([])
+  for i in tqdm(range(len(data_trial))):
+    
+    data_temp=data_trial[i].T
+    data_temp2=np.array([])
+    for j in tqdm(range(int(data_temp.shape[1]/segment_length))):
+      llim=j*500
+      data_temp1=data_temp[:,llim:llim+segment_length]
+      if j==0:
+        data_temp2=data_temp1[np.newaxis,:,:]
+      else:
+        data_temp2=np.vstack((data_temp2, data_temp1[np.newaxis,:,:]))
+        print(data_temp2.shape)
+    if i==0:
+      data_final=data_temp2
+      print("no")
+      print(data_final.shape)
+    else:
+      print("yes")
+      print(data_final.shape)
+      data_final=np.vstack((data_final, data_temp2))
+      #print(data_final.shape)
+  return data_final
+
 def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
 
   #subsampling by 4 
