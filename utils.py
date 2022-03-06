@@ -816,6 +816,7 @@ def createFV_individual(data_train, data_test, fs, l_feat, c_ref):
     else:
       HTFV_t=np.vstack((HTFV_t, HTFV_temp))
   #final_t.shape
+  final_t=np.hstack((final_t, HTFV_t))
 
   #MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH
   #importance per feature
