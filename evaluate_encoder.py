@@ -349,25 +349,25 @@ def baseline(args):
 
   elif(args.dataset=="speech"):
     data_ib=np.load('./data/speech.npz')
-    data_train_ib = data_ib["X"]
-    labels_train_ib = data_ib["y"]
+    data_train_ib = data_ib["X_Train"]
+    labels_train_ib = data_ib["Y_Train"]
     #500 Tstep
     data_train_ib_500, rep=segment_speech(data_train_ib, segment_length=500)
     print(np.amax(data_train_ib_500))
     print(np.amin(data_train_ib_500))
 
     segment_length=500
-    labels_train_ib_500=repeater(labels_train_ib)
+    labels_train_ib_500=repeater(labels_train_ib, rep)
 
     #1000 Tstep
     data_train_ib_1000, rep=segment_speech(data_train_ib, segment_length=1000)
     segment_length=1000
-    labels_train_ib_1000=repeater(labels_train_ib)
+    labels_train_ib_1000=repeater(labels_train_ib, rep)
 
     #1500 Tstep
     data_train_ib_1500=segment_speech(data_train_ib, segment_length=1500)
     segment_length=1500
-    labels_train_ib_1500=repeater(labels_train_ib)
+    labels_train_ib_1500=repeater(labels_train_ib, rep)
 
     #3000 Tstep
     data_train_ib_3000=data_train_ib
