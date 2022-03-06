@@ -352,22 +352,22 @@ def baseline(args):
     data_train_ib = data_ib["X"]
     labels_train_ib = data_ib["y"]
     #500 Tstep
-    data_train_ib_500=segment_speech(data_train_ib, segment_length=500)
+    data_train_ib_500, rep=segment_speech(data_train_ib, segment_length=500)
     print(np.amax(data_train_ib_500))
     print(np.amin(data_train_ib_500))
 
     segment_length=500
-    labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
+    labels_train_ib_500=repeater(labels_train_ib)
 
     #1000 Tstep
-    data_train_ib_1000=segment_speech(data_train_ib, segment_length=1000)
+    data_train_ib_1000, rep=segment_speech(data_train_ib, segment_length=1000)
     segment_length=1000
-    labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
+    labels_train_ib_1000=repeater(labels_train_ib)
 
     #1500 Tstep
     data_train_ib_1500=segment_speech(data_train_ib, segment_length=1500)
     segment_length=1500
-    labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
+    labels_train_ib_1500=repeater(labels_train_ib)
 
     #3000 Tstep
     data_train_ib_3000=data_train_ib
