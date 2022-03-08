@@ -245,8 +245,8 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     for j in range(data_2_subs_t.shape[1]):
       data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
       
-  data_hilbert=np.copy.deepcopy(data_2_subs)
-  data_hilbert_t=np.copy.deepcopy(data_2_subs_t)
+  data_hilbert=np.copy(data_2_subs)
+  data_hilbert_t=np.copy(data_2_subs_t)
   
   for j in range(0, data_hilbert.shape[0]):
     for i in range(0, data_hilbert.shape[1]):
@@ -267,7 +267,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       data_trial_s_h=[]
       for h in range(f_split):
         data_trial_s.append(data_trial[h*int(data_2_subs.shape[2]/f_split):(h+1)*int(data_2_subs.shape[2]/f_split),:])
-        data_trial_s_h.append(data_trial_h[h*int(data_2_subs.shape[2]/f_split):(h+1)*int(data_2_subs.shape[2]/f_split),:]
+        data_trial_s_h.append(data_trial_h[h*int(data_2_subs.shape[2]/f_split):(h+1)*int(data_2_subs.shape[2]/f_split),:])
         
         #print(data_trial_s1.shape)
         '''data_trial_s2=data_trial[int(data_2_subs.shape[2]/f_split):2*int(data_2_subs.shape[2]/f_split),:]
