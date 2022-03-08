@@ -312,13 +312,14 @@ def baseline(args):
     segment_length=[500,1000,1500,3000]
     l_feat=args.l_feat 
     n_iter=args.niter
+    f_split=args.f_split
 
     data_train_loop=training_data[str(args.tstep)]
     labels_train_loop=label_data[str(args.tstep)]
     data_test_loop=testing_data[str(args.tstep)]
     labels_test_loop=label_data_test[str(args.tstep)]
 
-    df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop, 1000, l_feat, True)
+    df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
     print(np.amax(df_train_temp.values))
     print(np.amin(df_train_temp.values))
     # Without feature selection check accuracy with Random forest
@@ -389,8 +390,9 @@ def baseline(args):
     acc=[]
     l_feat=args.l_feat 
     n_iter=args.niter
+    f_split=args.f_split
     for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], 3052, l_feat, True)
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 3052, l_feat, True)
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
@@ -465,8 +467,9 @@ def baseline(args):
     acc=[]
     l_feat=args.l_feat 
     n_iter=args.niter
+    f_split=args.f_split
     for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], 1000, l_feat, True)
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,1000, l_feat, True)
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
