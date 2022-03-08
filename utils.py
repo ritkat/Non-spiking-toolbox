@@ -616,15 +616,6 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
   final=np.hstack((final, HTFV))
   #final.shape'''
-
-  
-
-  for j in range(0, data_2_subs_t.shape[0]):
-      kr=data_2_subs_t[j,:,:]
-      
-      scaler=StandardScaler().fit(kr.T)
-      data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
-
   '''#bandpass filter
   b, a = signal.butter(2, 0.4, 'low', analog=False)
   data_2_subs_t = signal.filtfilt(b, a, data_2_subs_t, axis=2)'''
@@ -651,7 +642,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       #from statsmodels.datasets.sunspots import load
       #data = load()
                               
-      
+      ARFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
           for x in range(f_split):
             rho, sigma = sm.regression.linear_model.burg(data_trial_s[x][:,i], order=2)
@@ -685,7 +676,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       SPFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
           for x in range(f_split):
-            f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
+            f, Pxx_den = signal.welch(data_trial_s[x][:,i], fs)
             SPFV=np.append(SPFV, (Pxx_den))
           
       '''HUFV = np.array([])    
