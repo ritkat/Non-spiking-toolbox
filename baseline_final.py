@@ -167,23 +167,23 @@ if __name__ == '__main__':
             # logger.info('All done.')'''
 
     elif(args.method=="baseline"):
-        df = pd.DataFrame({"dataset":[],"tstep":[],"accuracy":[],"classifier":[],"best_params":[]})
+        df = pd.DataFrame({"dataset":[],"tstep":[],"accuracy":[],"std":[],"f_split":[],"classifier":[],"best_params":[]})
 
         parameters = dict(dataset=["bci3"],
-        tstep=[500],classifier=["SVM","RF"]
+        tstep=[3000],classifier=["RF","SVM"],f_split=[2,3]
         )
 
         n_generations=10
         l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         #args.gen=n_generations
         args.l_feat=l_feat
-        args.niter=200
+        args.niter=2
 
         param_values = [v for v in parameters.values()]
-        for args.dataset,args.tstep,args.classifier in product(*param_values):
+        for args.dataset,args.tstep,args.classifier,args.f_split in product(*param_values):
             accd,sd,best_params=baseline(args)
             #for n in range(args.gen+1):
-            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "std":sd,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
+            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"accuracy":accd, "std":sd,"f_split":args.f_split,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
             log_file_name = 'accuracy_log_'+str(args.dataset)+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
