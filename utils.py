@@ -854,12 +854,33 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   final_t.shape
 
   eegData_t=np.rollaxis(data_2_subs_t, 0, 3)
-  eegData_t.shape
+  eegData_ls_t=[]
+  for d in range(f_split):
+    eegData_ls_t.append(eegData_t[:,d*int(data_2_subs_t.shape[2]/f_split):(d+1)*int(data_2_subs_t.shape[2]/f_split),:])
+  #eegData_t.shape
+                              
+  for x in range(f_split):                           
+    #eegData_delta = eeg.filt_data(eegData, 0.5, 4, fs)
+    eegData_delta_t = eeg.filt_data(eegData_ls_t[x], 0.5, 4, fs)
+    eegData_theta_t = eeg.filt_data(eegData_ls_t[x], 4, 8, fs)
+    eegData_alpha_t = eeg.filt_data(eegData_ls_t[x], 8, 12, fs)
+    eegData_beta_t = eeg.filt_data(eegData_ls_t[x], 12, 30, fs)
+      #eegData_delta_l.append(
+    if(x==0):
+      ShannonRes_delta_t = eeg.shannonEntropy(eegData_delta_t, bin_min=-200, bin_max=200, binWidth=2).T
+      ShannonRes_theta_t = eeg.shannonEntropy(eegData_theta_t, bin_min=-200, bin_max=200, binWidth=2).T
+      ShannonRes_alpha_t = eeg.shannonEntropy(eegData_alpha_t, bin_min=-200, bin_max=200, binWidth=2).T
+      ShannonRes_beta_t = eeg.shannonEntropy(eegData_beta_t, bin_min=-200, bin_max=200, binWidth=2).T
+    else:
+      ShannonRes_delta_t = np.hstack((ShannonRes_delta_t, eeg.shannonEntropy(eegData_delta_t, bin_min=-200, bin_max=200, binWidth=2).T))
+      ShannonRes_theta_t = np.hstack((ShannonRes_theta_t, eeg.shannonEntropy(eegData_theta_t, bin_min=-200, bin_max=200, binWidth=2).T))
+      ShannonRes_alpha_t = np.hstack((ShannonRes_alpha_t, eeg.shannonEntropy(eegData_alpha_t, bin_min=-200, bin_max=200, binWidth=2).T))
+      ShannonRes_beta_t = np.hstack((ShannonRes_beta_t, eeg.shannonEntropy(eegData_beta_t, bin_min=-200, bin_max=200, binWidth=2).T))
 
 
   # Subband Information Quantity
   # delta (0.5–4 Hz)
-  eegData_delta_t = eeg.filt_data(eegData_t, 0.5, 4, fs)
+  '''eegData_delta_t = eeg.filt_data(eegData_t, 0.5, 4, fs)
   ShannonRes_delta_t = eeg.shannonEntropy(eegData_delta_t, bin_min=-200, bin_max=200, binWidth=2)
   # theta (4–8 Hz)
   eegData_theta_t = eeg.filt_data(eegData_t, 4, 8, fs)
@@ -872,11 +893,60 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   ShannonRes_beta_t = eeg.shannonEntropy(eegData_beta_t, bin_min=-200, bin_max=200, binWidth=2)
   # gamma (30–100 Hz)
   eegData_gamma_t = eeg.filt_data(eegData_t, 30, 80, fs)
-  ShannonRes_gamma_t = eeg.shannonEntropy(eegData_gamma_t, bin_min=-200, bin_max=200, binWidth=2)
+  ShannonRes_gamma_t = eeg.shannonEntropy(eegData_gamma_t, bin_min=-200, bin_max=200, binWidth=2)'''
+                              
+  # Hjorth Mobility
+  # Hjorth Complexity
+  for x in range(f_split):
+    #HjorthMob, HjorthComp = eeg.hjorthParameters(eegData)
+    if(x==0):
+      HjorthMob_t=eeg.hjorthParameters(eegData_ls_t[x])[0].T
+      HjorthComp_t=eeg.hjorthParameters(eegData_ls_t[x])[1].T
+    else:
+      HjorthMob_t=np.hstack((HjorthMob_t,eeg.hjorthParameters(eegData_ls_t[x])[0].T))
+      HjorthComp_t=np.hstack((HjorthComp_t,eeg.hjorthParameters(eegData_ls_t[x])[1].T))
+  # Median Frequency
+  for x in range(f_split):
+    if(x==0):
+      medianFreqRes_t = eeg.medianFreq(eegData_ls_t[x],fs).T
+    else:
+      medianFreqRes_t = np.hstack((medianFreqRes_t, eeg.medianFreq(eegData_ls_t[x],fs).T))
+      
+  for x in range(f_split):
+    if(x==0):
+      std_res_t = eeg.eegStd(eegData_ls_t[x]).T
+    else:
+      std_res_t = np.hstack((std_res_t, eeg.eegStd(eegData_ls_t[x]).T))
+  # Standard Deviation
+  
+  for x in range(f_split):
+    if(x==0):
+      regularity_res_t = eeg.eegRegularity(eegData_ls_t[x],fs).T
+    else:
+      regularity_res_t = np.hstack((regularity_res_t, eeg.eegRegularity(eegData_ls_t[x],fs).T))
+  # Regularity (burst-suppression)
+  #regularity_res = eeg.eegRegularity(eegData,fs)
+
+  # Spikes
+  minNumSamples = int(70*fs/1000)
+  for x in range(f_split):
+    if(x==0):
+      spikeNum_res_t = eeg.spikeNum(eegData_ls_t[x],minNumSamples).T
+    else:
+      spikeNum_res_t = np.hstack((spikeNum_res_t, eeg.spikeNum(eegData_ls_t[x],minNumSamples).T))
+                              
+  
+
+  # Sharp spike
+  for x in range(f_split):
+    if(x==0):
+      sharpSpike_res_t = eeg.shortSpikeNum(eegData_ls_t[x],minNumSamples).T
+    else:
+      sharpSpike_res_t = np.hstack((sharpSpike_res_t, eeg.spikeNum(eegData_ls_t[x],minNumSamples).T))
 
   # Hjorth Mobility
   # Hjorth Complexity
-  HjorthMob_t, HjorthComp_t = eeg.hjorthParameters(eegData_t)
+  '''HjorthMob_t, HjorthComp_t = eeg.hjorthParameters(eegData_t)
 
 
   # Median Frequency
@@ -894,14 +964,14 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
 
   # Sharp spike
-  sharpSpike_res_t = eeg.shortSpikeNum(eegData_t,minNumSamples)
+  sharpSpike_res_t = eeg.shortSpikeNum(eegData_t,minNumSamples)'''
   #REMPMVPOMMPOMPOMPOMPOMOMPOMPOM
-  concated_t=np.concatenate(( ShannonRes_delta_t.T, ShannonRes_theta_t.T, ShannonRes_alpha_t.T, ShannonRes_beta_t.T, ShannonRes_gamma_t.T, HjorthMob_t.T, HjorthComp_t.T, medianFreqRes_t.T, std_res_t.T, regularity_res_t.T, spikeNum_res_t.T, sharpSpike_res_t.T), axis=1)
+  concated_t=np.concatenate(( ShannonRes_delta_t, ShannonRes_theta_t, ShannonRes_alpha_t, ShannonRes_beta_t, ShannonRes_gamma_t, HjorthMob_t, HjorthComp_t, medianFreqRes_t, std_res_t, regularity_res_t, spikeNum_res_t, sharpSpike_res_t), axis=1)
 
   final_t=np.hstack((final_t, concated_t))
 
   # δ band Power
-  bandPwr_delta_t = eeg.bandPower(eegData_t, 0.5, 4, fs)
+  '''bandPwr_delta_t = eeg.bandPower(eegData_t, 0.5, 4, fs)
   #too large
   # θ band Power
   bandPwr_theta_t = eeg.bandPower(eegData_t, 4, 8, fs)
@@ -910,15 +980,20 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   bandPwr_alpha_t = eeg.bandPower(eegData_t, 8, 12, fs)
   #too large
   # β band Power
-  bandPwr_beta_t = eeg.bandPower(eegData_t, 12, 30, fs)
+  bandPwr_beta_t = eeg.bandPower(eegData_t, 12, 30, fs)'''
   #too large
   # γ band Power
-  bandPwr_gamma_t = eeg.bandPower(eegData_t, 30, 80, fs)
+  for x in range(f_split):
+    if(x==0):
+      bandPwr_gamma_t = eeg.bandPower(eegData_ls_t[x], 30, 80, fs).T
+    else:
+      bandPwr_gamma_t = np.hstack((bandPwr_gamma_t, eeg.bandPower(eegData_ls_t[x], 30, 80, fs).T))
+  #bandPwr_gamma_t = eeg.bandPower(eegData_t, 30, 80, fs)
 
-  concated_n_t= bandPwr_gamma_t.T
+  concated_n_t= bandPwr_gamma_t
   final_t=np.hstack((final_t, concated_n_t))
 
-  HTFV_t=np.array([])
+  '''HTFV_t=np.array([])
   for j in range(0, eegData_t.shape[2]):
     eegData_temp=eegData_t[:,:,j]
     HTFV_temp=np.array([])
@@ -929,53 +1004,53 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     else:
       HTFV_t=np.vstack((HTFV_t, HTFV_temp))
   #final_t.shape
-  final_t=np.hstack((final_t, HTFV_t))
+  final_t=np.hstack((final_t, HTFV_t))'''
 
   #MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH
   #importance per feature
   nfeatures_1=ARFV.shape[0]
   nfeatures_2=HWDFV.shape[0]
-  nfeatures_3=HWDFV1.shape[0]
-  nfeatures_4=SPFV.shape[0]
+  #nfeatures_3=HWDFV1.shape[0]
+  nfeatures_3=SPFV.shape[0]
   #nfeatures_4=HUFV.shape[0]
-  nfeatures_5=PFDFV.shape[0]
-  nfeatures_6=DFAFV.shape[0]
-  nfeatures_7=MNFV.shape[0]
-  nfeatures_8=STDFV.shape[0]
+  nfeatures_4=PFDFV.shape[0]
+  nfeatures_5=DFAFV.shape[0]
+  nfeatures_6=MNFV.shape[0]
+  nfeatures_7=STDFV.shape[0]
   #nfeatures_9=CORFV.shape[0]
-  nfeatures_9=MT1FV.shape[0]
-  nfeatures_10=MT2FV.shape[0]
-  nfeatures_11=LDFV.shape[0]
-  nfeatures_12=MDNFV.shape[0]
-  nfeatures_13=ABDFV.shape[0]
-  nfeatures_14=MFQFV.shape[0]
-  nfeatures_15=FAMFV.shape[0]
-  nfeatures_16=MPSFV.shape[0]
-  nfeatures_17=MT1FVH.shape[0]
-  nfeatures_18=MT2FVH.shape[0]
-  nfeatures_19=LDFVH.shape[0]
-  nfeatures_20=MDNFVH.shape[0]
-  nfeatures_21=ABDFVH.shape[0]
-  nfeatures_22=MFQFVH.shape[0]
-  nfeatures_23=FAMFVH.shape[0]
-  nfeatures_24=MPSFVH.shape[0]
+  nfeatures_8=MT1FV.shape[0]
+  nfeatures_9=MT2FV.shape[0]
+  nfeatures_10=LDFV.shape[0]
+  nfeatures_11=MDNFV.shape[0]
+  nfeatures_12=ABDFV.shape[0]
+  nfeatures_13=MFQFV.shape[0]
+  nfeatures_14=FAMFV.shape[0]
+  nfeatures_15=MPSFV.shape[0]
+  nfeatures_16=MT1FVH.shape[0]
+  nfeatures_17=MT2FVH.shape[0]
+  nfeatures_18=LDFVH.shape[0]
+  nfeatures_19=MDNFVH.shape[0]
+  nfeatures_20=ABDFVH.shape[0]
+  nfeatures_21=MFQFVH.shape[0]
+  nfeatures_22=FAMFVH.shape[0]
+  nfeatures_23=MPSFVH.shape[0]
   
 
   #EEG EXTRACT FEATURES
-  nfeatures_25=ShannonRes_delta.shape[0]
-  nfeatures_26=ShannonRes_theta.shape[0]
-  nfeatures_27=ShannonRes_alpha.shape[0]
-  nfeatures_28=ShannonRes_beta.shape[0]
-  nfeatures_29=ShannonRes_gamma.shape[0]
-  nfeatures_30=HjorthMob.shape[0]
-  nfeatures_31=HjorthComp.shape[0]
-  nfeatures_32=medianFreqRes.shape[0]
-  nfeatures_33=std_res.shape[0]
-  nfeatures_34=regularity_res.shape[0]
-  nfeatures_35=spikeNum_res.shape[0]
-  nfeatures_36=sharpSpike_res.shape[0]
-  nfeatures_37=bandPwr_gamma.shape[0]
-  nfeatures_38=HTFV_temp.shape[0]
+  nfeatures_24=ShannonRes_delta.shape[1]
+  nfeatures_25=ShannonRes_theta.shape[1]
+  nfeatures_26=ShannonRes_alpha.shape[1]
+  nfeatures_27=ShannonRes_beta.shape[1]
+  nfeatures_28=ShannonRes_gamma.shape[1]
+  nfeatures_29=HjorthMob.shape[1]
+  nfeatures_30=HjorthComp.shape[1]
+  nfeatures_31=medianFreqRes.shape[1]
+  nfeatures_32=std_res.shape[1]
+  nfeatures_33=regularity_res.shape[1]
+  nfeatures_34=spikeNum_res.shape[1]
+  nfeatures_35=sharpSpike_res.shape[1]
+  nfeatures_36=bandPwr_gamma.shape[1]
+  #nfeatures_38=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
   nfeatures_18=bandPwr_gamma.shape[0]
@@ -1021,14 +1096,14 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   llim35=llim34+nfeatures_34
   llim36=llim35+nfeatures_35
   llim37=llim36+nfeatures_36
-  llim38=llim37+nfeatures_37
-  llm39=llim38+nfeatures_38
+  #llim38=llim37+nfeatures_37
+  #llm39=llim38+nfeatures_38
   #llim23=llim22+nfeatures_22
   #llim24=llim23+nfeatures_23
   #llim25=llim24+nfeatures_24
 
-  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24,llim25,llim26,llim27,llim28,llim29,llim30,llim31,llim32,llim33,llim34,llim35,llim36,llim37,llim38]
-  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24,nfeatures_25,nfeatures_26,nfeatures_27,nfeatures_28,nfeatures_29,nfeatures_30,nfeatures_31,nfeatures_32,nfeatures_33,nfeatures_34,nfeatures_35,nfeatures_36,nfeatures_37,nfeatures_38]
+  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24,llim25,llim26,llim27,llim28,llim29,llim30,llim31,llim32,llim33,llim34,llim35,llim36,llim37]
+  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24,nfeatures_25,nfeatures_26,nfeatures_27,nfeatures_28,nfeatures_29,nfeatures_30,nfeatures_31,nfeatures_32,nfeatures_33,nfeatures_34,nfeatures_35,nfeatures_36]
 
   for i, lf in enumerate(l_feat):
     print("trial"+str(lf))
