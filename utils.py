@@ -282,7 +282,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       ARFV=np.array([])
 
       for i in range(0, data_train.shape[1]):
-          for x in range(len(f_split)):
+          for x in range(f_split):
             rho, sigma = sm.regression.linear_model.burg(data_trial_s[x][:,i], order=2)
             '''rho2, sigma2 = sm.regression.linear_model.burg(data_trial_s2[:,i], order=2)
             rho3, sigma3 = sm.regression.linear_model.burg(data_trial_s3[:,i], order=2)'''
@@ -295,7 +295,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       HWDFV=np.array([])
       for i in range(0, data_train.shape[1]):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          for x in range(len(f_split)):
+          for x in range(f_split):
             coeffs = wavedec(data_trial_s[x][:,i], 'haar',level=6)
             cA6,cD6,cD5,cD4,cD3, cD2, cD1=coeffs
             cD6_a=autocorr(cD6)
@@ -313,7 +313,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_train.shape[1]):
-          for x in range(len(f_split)):
+          for x in range(f_split):
             f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
             SPFV=np.append(SPFV, (Pxx_den))
           
@@ -324,138 +324,138 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       
       PFDFV = np.array([])    
       for i in range(0, data_train.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           pfd=pyeeg.pfd(data_trial_s[x][:,i])
           PFDFV = np.append(PFDFV, pfd)
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
       for i in range(0, data_train.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           dfa=pyeeg.dfa(data_trial_s[x][:,i])
           DFAFV = np.append(DFAFV, dfa)
         
       MNFV = np.array([])
       for i in range(0, data_train.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           mn=np.mean(data_trial_s[x][:,i])
           MNFV = np.append(MNFV, mn)
         
       STDFV = np.array([])
       for i in range(0, data_train.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           sd=np.std(data_trial_s[x][:,i])
           STDFV = np.append(STDFV, sd)
         
       MT1FV=np.array([])
       for i in range(0, data_train.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean1(data_trial_s[x][:,i])
           MT1FV = np.append(MT1FV, f)
           
       MT2FV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean2(data_trial_s[x][:,i])
           MT2FV = np.append(MT2FV, f)
           
       LDFV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = log_detec(data_trial_s[x][:,i])
           LDFV = np.append(LDFV, f)
           
       MDNFV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = np.median(np.absolute(data_trial_s[x][:,i]))
           MDNFV = np.append(MDNFV, f)
           
       ABDFV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = abs_diff(data_trial_s[x][:,i])
           ABDFV = np.append(ABDFV, f)
           
       MFQFV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean_freq(data_trial_s[x][:,i])
           MFQFV = np.append(MFQFV, f)
           
       FAMFV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = freq_atmax(data_trial_s[x][:,i])
           FAMFV = np.append(FAMFV, f)
           
       MPSFV=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = max_psd(data_trial_s[x][:,i])
           MPSFV = np.append(MPSFV, f)
           
       MT1FVH=np.array([])
       for i in range(0, data_train.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_h_s[x][:,i])
+          f = mean1(data_trial_s_h[x][:,i])
           MT1FVH = np.append(MT1FVH, f)
           
       MT2FVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_h_s[x][:,i])
+          f = mean2(data_trial_s_h[x][:,i])
           MT2FVH = np.append(MT2FVH, f)
           
       LDFVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_h_s[x][:,i])
+          f = log_detec(data_trial_s_h[x][:,i])
           LDFVH = np.append(LDFVH, f)
           
       MDNFVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_h_s[x][:,i]))
+          f = np.median(np.absolute(data_trial_s_h[x][:,i]))
           MDNFVH = np.append(MDNFVH, f)
           
       ABDFVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_h_s[x][:,i])
+          f = abs_diff(data_trial_s_h[x][:,i])
           ABDFVH = np.append(ABDFVH, f)
           
       MFQFVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_h_s[x][:,i])
+          f = mean_freq(data_trial_s_h[x][:,i])
           MFQFVH = np.append(MFQFVH, f)
           
       FAMFVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_h_s[x][:,i])
+          f = freq_atmax(data_trial_s_h[x][:,i])
           FAMFVH = np.append(FAMFVH, f)
           
       MPSFVH=np.array([])
       for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_h_s[x][:,i])
+          f = max_psd(data_trial_s_h[x][:,i])
           MPSFVH = np.append(MPSFVH, f)
           
           
@@ -499,17 +499,20 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     eegData_theta = eeg.filt_data(eegData_ls[x], 4, 8, fs)
     eegData_alpha = eeg.filt_data(eegData_ls[x], 8, 12, fs)
     eegData_beta = eeg.filt_data(eegData_ls[x], 12, 30, fs)
-      #eegData_delta_l.append(
+    eegData_gamma = eeg.filt_data(eegData_ls[x], 30, 80, fs)
+    #eegData_delta_l.append(
     if(x==0):
       ShannonRes_delta = eeg.shannonEntropy(eegData_delta, bin_min=-200, bin_max=200, binWidth=2).T
       ShannonRes_theta = eeg.shannonEntropy(eegData_theta, bin_min=-200, bin_max=200, binWidth=2).T
       ShannonRes_alpha = eeg.shannonEntropy(eegData_alpha, bin_min=-200, bin_max=200, binWidth=2).T
       ShannonRes_beta = eeg.shannonEntropy(eegData_beta, bin_min=-200, bin_max=200, binWidth=2).T
+      ShannonRes_gamma = eeg.shannonEntropy(eegData_gamma, bin_min=-200, bin_max=200, binWidth=2).T
     else:
       ShannonRes_delta = np.hstack((ShannonRes_delta, eeg.shannonEntropy(eegData_delta, bin_min=-200, bin_max=200, binWidth=2).T))
       ShannonRes_theta = np.hstack((ShannonRes_theta, eeg.shannonEntropy(eegData_theta, bin_min=-200, bin_max=200, binWidth=2).T))
       ShannonRes_alpha = np.hstack((ShannonRes_alpha, eeg.shannonEntropy(eegData_alpha, bin_min=-200, bin_max=200, binWidth=2).T))
       ShannonRes_beta = np.hstack((ShannonRes_beta, eeg.shannonEntropy(eegData_beta, bin_min=-200, bin_max=200, binWidth=2).T))
+      ShannonRes_gamma = np.hstack((ShannonRes_gamma, eeg.shannonEntropy(eegData_gamma, bin_min=-200, bin_max=200, binWidth=2).T))
     
   # theta (4–8 Hz)
   '''eegData_theta = eeg.filt_data(eegData, 4, 8, fs)
@@ -635,7 +638,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       data_trial_s_h=[]
       for h in range(f_split):
         data_trial_s.append(data_trial[h*int(data_2_subs_t.shape[2]/f_split):(h+1)*int(data_2_subs_t.shape[2]/f_split),:])
-        data_trial_s_h.append(data_trial_h[h*int(data_2_subs_t.shape[2]/f_split):(h+1)*int(data_2_subs_t.shape[2]/f_split),:]
+        data_trial_s_h.append(data_trial_h[h*int(data_2_subs_t.shape[2]/f_split):(h+1)*int(data_2_subs_t.shape[2]/f_split),:])
 
       '''data_trial_s1=data_trial[0:int(data_2_subs_t.shape[2]/3),:]
       #print(data_trial_s1.shape)
@@ -650,7 +653,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
                               
       
       for i in range(0, data_2_subs_t.shape[1].shape[1]):
-          for x in range(len(f_split)):
+          for x in range(f_split):
             rho, sigma = sm.regression.linear_model.burg(data_trial_s[x][:,i], order=2)
             '''rho2, sigma2 = sm.regression.linear_model.burg(data_trial_s2[:,i], order=2)
             rho3, sigma3 = sm.regression.linear_model.burg(data_trial_s3[:,i], order=2)'''
@@ -663,7 +666,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       HWDFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          for x in range(len(f_split)):
+          for x in range(f_split):
             coeffs = wavedec(data_trial_s[x][:,i], 'haar',level=6)
             cA6,cD6,cD5,cD4,cD3, cD2, cD1=coeffs
             cD6_a=autocorr(cD6)
@@ -681,7 +684,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-          for x in range(len(f_split)):
+          for x in range(f_split):
             f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
             SPFV=np.append(SPFV, (Pxx_den))
           
@@ -692,139 +695,139 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       
       PFDFV = np.array([])    
       for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           pfd=pyeeg.pfd(data_trial_s[x][:,i])
           PFDFV = np.append(PFDFV, pfd)
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           dfa=pyeeg.dfa(data_trial_s[x][:,i])
           DFAFV = np.append(DFAFV, dfa)
         
         
       MNFV = np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           mn=np.mean(data_trial_s[x][:,i])
           MNFV = np.append(MNFV, mn)
         
       STDFV = np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           sd=np.std(data_trial_s[x][:,i])
           STDFV = np.append(STDFV, sd)
         
       MT1FV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean1(data_trial_s[x][:,i])
           MT1FV = np.append(MT1FV, f)
           
       MT2FV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean2(data_trial_s[x][:,i])
           MT2FV = np.append(MT2FV, f)
           
       LDFV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = log_detec(data_trial_s[x][:,i])
           LDFV = np.append(LDFV, f)
           
       MDNFV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = np.median(np.absolute(data_trial_s[x][:,i]))
           MDNFV = np.append(MDNFV, f)
           
       ABDFV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = abs_diff(data_trial_s[x][:,i])
           ABDFV = np.append(ABDFV, f)
           
       MFQFV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = mean_freq(data_trial_s[x][:,i])
           MFQFV = np.append(MFQFV, f)
           
       FAMFV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = freq_atmax(data_trial_s[x][:,i])
           FAMFV = np.append(FAMFV, f)
           
       MPSFV=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = max_psd(data_trial_s[x][:,i])
           MPSFV = np.append(MPSFV, f)
                               
       MT1FVH=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_h_s[x][:,i])
+          f = mean1(data_trial_s_h[x][:,i])
           MT1FVH = np.append(MT1FVH, f)
           
       MT2FVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_h_s[x][:,i])
+          f = mean2(data_trial_s_h[x][:,i])
           MT2FVH = np.append(MT2FVH, f)
           
       LDFVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_h_s[x][:,i])
+          f = log_detec(data_trial_s_h[x][:,i])
           LDFVH = np.append(LDFVH, f)
           
       MDNFVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_h_s[x][:,i]))
+          f = np.median(np.absolute(data_trial_s_h[x][:,i]))
           MDNFVH = np.append(MDNFVH, f)
           
       ABDFVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_h_s[x][:,i])
+          f = abs_diff(data_trial_s_h[x][:,i])
           ABDFVH = np.append(ABDFVH, f)
           
       MFQFVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_h_s[x][:,i])
+          f = mean_freq(data_trial_s_h[x][:,i])
           MFQFVH = np.append(MFQFVH, f)
           
       FAMFVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_h_s[x][:,i])
+          f = freq_atmax(data_trial_s_h[x][:,i])
           FAMFVH = np.append(FAMFVH, f)
           
       MPSFVH=np.array([])
       for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(len(f_split)):
+        for x in range(f_split):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_h_s[x][:,i])
+          f = max_psd(data_trial_s_h[x][:,i])
           MPSFVH = np.append(MPSFVH, f)
                               
          
@@ -841,7 +844,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       
 
       #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV,HWDFV,HWDFV1,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH), axis=None)
+      concated=np.concatenate((ARFV,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final_t=concated
@@ -865,17 +868,20 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     eegData_theta_t = eeg.filt_data(eegData_ls_t[x], 4, 8, fs)
     eegData_alpha_t = eeg.filt_data(eegData_ls_t[x], 8, 12, fs)
     eegData_beta_t = eeg.filt_data(eegData_ls_t[x], 12, 30, fs)
+    eegData_gamma_t = eeg.filt_data(eegData_ls_t[x], 30, 80, fs)
       #eegData_delta_l.append(
     if(x==0):
       ShannonRes_delta_t = eeg.shannonEntropy(eegData_delta_t, bin_min=-200, bin_max=200, binWidth=2).T
       ShannonRes_theta_t = eeg.shannonEntropy(eegData_theta_t, bin_min=-200, bin_max=200, binWidth=2).T
       ShannonRes_alpha_t = eeg.shannonEntropy(eegData_alpha_t, bin_min=-200, bin_max=200, binWidth=2).T
       ShannonRes_beta_t = eeg.shannonEntropy(eegData_beta_t, bin_min=-200, bin_max=200, binWidth=2).T
+      ShannonRes_gamma_t = eeg.shannonEntropy(eegData_gamma_t, bin_min=-200, bin_max=200, binWidth=2).T
     else:
       ShannonRes_delta_t = np.hstack((ShannonRes_delta_t, eeg.shannonEntropy(eegData_delta_t, bin_min=-200, bin_max=200, binWidth=2).T))
       ShannonRes_theta_t = np.hstack((ShannonRes_theta_t, eeg.shannonEntropy(eegData_theta_t, bin_min=-200, bin_max=200, binWidth=2).T))
       ShannonRes_alpha_t = np.hstack((ShannonRes_alpha_t, eeg.shannonEntropy(eegData_alpha_t, bin_min=-200, bin_max=200, binWidth=2).T))
       ShannonRes_beta_t = np.hstack((ShannonRes_beta_t, eeg.shannonEntropy(eegData_beta_t, bin_min=-200, bin_max=200, binWidth=2).T))
+      ShannonRes_gamma_t = np.hstack((ShannonRes_gamma_t, eeg.shannonEntropy(eegData_gamma_t, bin_min=-200, bin_max=200, binWidth=2).T))
 
 
   # Subband Information Quantity
