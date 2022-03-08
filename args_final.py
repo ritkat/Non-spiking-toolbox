@@ -33,6 +33,9 @@ def args():
         "--nfeatures", default=17, type=int, help="Dataset(BCI3)"
     )
     parser.add_argument(
+        "--f_split", default=2, type=int, help="Dataset(BCI3)"
+    )
+    parser.add_argument(
         "--max_feat", default=int(5), help="Select None for no restriction on max_features and specify int for restricting the max features"
     )
     parser.add_argument(
