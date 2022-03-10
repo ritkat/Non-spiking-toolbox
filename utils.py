@@ -290,6 +290,31 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
             ARFV=np.append(ARFV, rho)
 
       #print(ARFV) 
+      
+      ARFV1=np.array([])
+
+      for i in range(0, data_train.shape[1]):
+          rho1, sigma1 = sm.regression.linear_model.burg(data_trial_s1[:,i], order=2)
+          rho2, sigma2 = sm.regression.linear_model.burg(data_trial_s2[:,i], order=2)
+          rho3, sigma3 = sm.regression.linear_model.burg(data_trial_s3[:,i], order=2)
+          ARFV1=np.append(ARFV1, (rho1, rho2, rho3))
+
+      #print(ARFV) 
+
+      #Haar wavelet
+
+      HWDFV1=np.array([])
+      for i in range(0, data_train.shape[1]):
+          (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+          HWDFV1=np.append(HWDFV1, cA)
+
+      #Spectral Power estimates
+      SPFV1=np.array([])
+      for i in range(0, data_train.shape[1]):
+          f1, Pxx_den1 = signal.welch(data_trial_s1[:,i], int(data_2_subs.shape[2]/3))
+          f2, Pxx_den2 = signal.welch(data_trial_s2[:,i], int(data_2_subs.shape[2]/3))
+          f3, Pxx_den3 = signal.welch(data_trial_s3[:,i], int(data_2_subs.shape[2]/3))
+          SPFV1=np.append(SPFV1, (Pxx_den1, Pxx_den2, Pxx_den3))
 
       #Haar wavelet
 
@@ -603,7 +628,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   concated_n=bandPwr_gamma
   final=np.hstack((final, concated_n))
 
-  '''HTFV=np.array([])
+  HTFV=np.array([])
   for j in range(0, eegData.shape[2]):
     eegData_temp=eegData[:,:,j]
     HTFV_temp=np.array([])
@@ -616,7 +641,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     print(j)
 
   final=np.hstack((final, HTFV))
-  #final.shape'''
+  #final.shape
   '''#bandpass filter
   b, a = signal.butter(2, 0.4, 'low', analog=False)
   data_2_subs_t = signal.filtfilt(b, a, data_2_subs_t, axis=2)'''
@@ -632,12 +657,12 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         data_trial_s.append(data_trial[h*int(data_2_subs_t.shape[2]/f_split):(h+1)*int(data_2_subs_t.shape[2]/f_split),:])
         data_trial_s_h.append(data_trial_h[h*int(data_2_subs_t.shape[2]/f_split):(h+1)*int(data_2_subs_t.shape[2]/f_split),:])
 
-      '''data_trial_s1=data_trial[0:int(data_2_subs_t.shape[2]/3),:]
+      data_trial_s1=data_trial[0:int(data_2_subs_t.shape[2]/3),:]
       #print(data_trial_s1.shape)
       data_trial_s2=data_trial[int(data_2_subs_t.shape[2]/3):2*int(data_2_subs_t.shape[2]/3),:]
       #print(data_trial_s2.shape)
       data_trial_s3=data_trial[2*int(data_2_subs_t.shape[2]/3):3*int(data_2_subs_t.shape[2]/3),:]
-      #print(data_trial_s3.shape)'''
+      #print(data_trial_s3.shape)
 
       #AR Coefficients
       #from statsmodels.datasets.sunspots import load
@@ -991,7 +1016,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   concated_n_t= bandPwr_gamma_t
   final_t=np.hstack((final_t, concated_n_t))
 
-  '''HTFV_t=np.array([])
+  HTFV_t=np.array([])
   for j in range(0, eegData_t.shape[2]):
     eegData_temp=eegData_t[:,:,j]
     HTFV_temp=np.array([])
@@ -1002,7 +1027,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     else:
       HTFV_t=np.vstack((HTFV_t, HTFV_temp))
   #final_t.shape
-  final_t=np.hstack((final_t, HTFV_t))'''
+  final_t=np.hstack((final_t, HTFV_t))
 
   #MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH
   #importance per feature
