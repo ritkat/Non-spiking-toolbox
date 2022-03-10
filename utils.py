@@ -497,7 +497,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         hj=pyeeg.hjorth(data_trial[:,i],1)
         HJFV = np.append(HJFV, hj)'''
       
-      concated=np.concatenate((ARFV,ARFV1,HWDFV1,SPFV1,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH,HTFV), axis=None)
+      concated=np.concatenate((ARFV,ARFV1,HWDFV1,SPFV1,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final=concated
@@ -885,7 +885,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       
 
       #Concatenaton of All the feature vectors
-      concated=np.concatenate((ARFV,ARFV1,HWDFV1,SPFV1,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH,HTFV), axis=None)
+      concated=np.concatenate((ARFV,ARFV1,HWDFV1,SPFV1,HWDFV,SPFV,PFDFV,DFAFV,MNFV,STDFV,MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH), axis=None)
       concated=np.reshape(concated, (-1, 1))
       if j==0:
           final_t=concated
