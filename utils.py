@@ -1056,47 +1056,50 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   #MT1FV,MT2FV,LDFV, MDNFV, ABDFV, MFQFV, FAMFV, MPSFV,MT1FVH,MT2FVH,LDFVH,MDNFVH,ABDFVH,MFQFVH,FAMFVH,MPSFVH
   #importance per feature
   nfeatures_1=ARFV.shape[0]
-  nfeatures_2=HWDFV.shape[0]
+  nfeatures_2=ARFV1.shape[0]
+  nfeatures_3=HWDFV1.shape[0]
+  nfeatures_4=SPFV1.shape[0]
+  nfeatures_5=HWDFV.shape[0]
   #nfeatures_3=HWDFV1.shape[0]
-  nfeatures_3=SPFV.shape[0]
+  nfeatures_6=SPFV.shape[0]
   #nfeatures_4=HUFV.shape[0]
-  nfeatures_4=PFDFV.shape[0]
-  nfeatures_5=DFAFV.shape[0]
-  nfeatures_6=MNFV.shape[0]
-  nfeatures_7=STDFV.shape[0]
+  nfeatures_7=PFDFV.shape[0]
+  nfeatures_8=DFAFV.shape[0]
+  nfeatures_9=MNFV.shape[0]
+  nfeatures_10=STDFV.shape[0]
   #nfeatures_9=CORFV.shape[0]
-  nfeatures_8=MT1FV.shape[0]
-  nfeatures_9=MT2FV.shape[0]
-  nfeatures_10=LDFV.shape[0]
-  nfeatures_11=MDNFV.shape[0]
-  nfeatures_12=ABDFV.shape[0]
-  nfeatures_13=MFQFV.shape[0]
-  nfeatures_14=FAMFV.shape[0]
-  nfeatures_15=MPSFV.shape[0]
-  nfeatures_16=MT1FVH.shape[0]
-  nfeatures_17=MT2FVH.shape[0]
-  nfeatures_18=LDFVH.shape[0]
-  nfeatures_19=MDNFVH.shape[0]
-  nfeatures_20=ABDFVH.shape[0]
-  nfeatures_21=MFQFVH.shape[0]
-  nfeatures_22=FAMFVH.shape[0]
-  nfeatures_23=MPSFVH.shape[0]
+  nfeatures_11=MT1FV.shape[0]
+  nfeatures_12=MT2FV.shape[0]
+  nfeatures_13=LDFV.shape[0]
+  nfeatures_14=MDNFV.shape[0]
+  nfeatures_15=ABDFV.shape[0]
+  nfeatures_16=MFQFV.shape[0]
+  nfeatures_17=FAMFV.shape[0]
+  nfeatures_18=MPSFV.shape[0]
+  nfeatures_19=MT1FVH.shape[0]
+  nfeatures_20=MT2FVH.shape[0]
+  nfeatures_21=LDFVH.shape[0]
+  nfeatures_22=MDNFVH.shape[0]
+  nfeatures_23=ABDFVH.shape[0]
+  nfeatures_24=MFQFVH.shape[0]
+  nfeatures_25=FAMFVH.shape[0]
+  nfeatures_26=MPSFVH.shape[0]
   
 
   #EEG EXTRACT FEATURES
-  nfeatures_24=ShannonRes_delta.shape[1]
-  nfeatures_25=ShannonRes_theta.shape[1]
-  nfeatures_26=ShannonRes_alpha.shape[1]
-  nfeatures_27=ShannonRes_beta.shape[1]
-  nfeatures_28=ShannonRes_gamma.shape[1]
-  nfeatures_29=HjorthMob.shape[1]
-  nfeatures_30=HjorthComp.shape[1]
-  nfeatures_31=medianFreqRes.shape[1]
-  nfeatures_32=std_res.shape[1]
-  nfeatures_33=regularity_res.shape[1]
-  nfeatures_34=spikeNum_res.shape[1]
-  nfeatures_35=sharpSpike_res.shape[1]
-  nfeatures_36=bandPwr_gamma.shape[1]
+  nfeatures_27=ShannonRes_delta.shape[1]
+  nfeatures_28=ShannonRes_theta.shape[1]
+  nfeatures_29=ShannonRes_alpha.shape[1]
+  nfeatures_30=ShannonRes_beta.shape[1]
+  nfeatures_31=ShannonRes_gamma.shape[1]
+  nfeatures_32=HjorthMob.shape[1]
+  nfeatures_33=HjorthComp.shape[1]
+  nfeatures_34=medianFreqRes.shape[1]
+  nfeatures_35=std_res.shape[1]
+  nfeatures_36=regularity_res.shape[1]
+  nfeatures_37=spikeNum_res.shape[1]
+  nfeatures_38=sharpSpike_res.shape[1]
+  nfeatures_39=bandPwr_gamma.shape[1]
   #nfeatures_38=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
@@ -1143,14 +1146,15 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   llim35=llim34+nfeatures_34
   llim36=llim35+nfeatures_35
   llim37=llim36+nfeatures_36
-  #llim38=llim37+nfeatures_37
-  #llm39=llim38+nfeatures_38
+  llim38=llim37+nfeatures_37
+  llim39=llim38+nfeatures_38
+  llim40=llim39+nfeatures_39
   #llim23=llim22+nfeatures_22
   #llim24=llim23+nfeatures_23
   #llim25=llim24+nfeatures_24
 
-  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24,llim25,llim26,llim27,llim28,llim29,llim30,llim31,llim32,llim33,llim34,llim35,llim36,llim37]
-  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24,nfeatures_25,nfeatures_26,nfeatures_27,nfeatures_28,nfeatures_29,nfeatures_30,nfeatures_31,nfeatures_32,nfeatures_33,nfeatures_34,nfeatures_35,nfeatures_36]
+  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24,llim25,llim26,llim27,llim28,llim29,llim30,llim31,llim32,llim33,llim34,llim35,llim36,llim37,llim38,llim39,llim40]
+  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24,nfeatures_25,nfeatures_26,nfeatures_27,nfeatures_28,nfeatures_29,nfeatures_30,nfeatures_31,nfeatures_32,nfeatures_33,nfeatures_34,nfeatures_35,nfeatures_36,nfeatures_37,nfeatures_38,nfeatures_39]
 
   for i, lf in enumerate(l_feat):
     print("trial"+str(lf))
