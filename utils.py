@@ -289,7 +289,10 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
             '''rho2, sigma2 = sm.regression.linear_model.burg(data_trial_s2[:,i], order=2)
             rho3, sigma3 = sm.regression.linear_model.burg(data_trial_s3[:,i], order=2)'''
             ARFV=np.append(ARFV, rho)
-
+            print("SHAPE OF ARFV IN X"+str(x)+" "+str(ARFV.shape))
+      print("MAXIMUM OF ARFV"+str(np.amax(ARFV)))
+      print("MINIMUM OF ARFV"+str(np.amin(ARFV)))
+      print("SHAPE OF ARFV"+ str(ARFV.shape))
       #print(ARFV) 
       
       ARFV1=np.array([])
@@ -299,6 +302,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
           rho2, sigma2 = sm.regression.linear_model.burg(data_trial_s2[:,i], order=2)
           rho3, sigma3 = sm.regression.linear_model.burg(data_trial_s3[:,i], order=2)
           ARFV1=np.append(ARFV1, (rho1, rho2, rho3))
+      print("SHAPE OF ARFV1"+ str(ARFV1.shape))
 
       #print(ARFV) 
 
@@ -308,6 +312,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       for i in range(0, data_train.shape[1]):
           (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           HWDFV1=np.append(HWDFV1, cA)
+      print("SHAPE OF HwDFV1"+ str(HWDFV1.shape))
 
       #Spectral Power estimates
       SPFV1=np.array([])
@@ -316,6 +321,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
           f2, Pxx_den2 = signal.welch(data_trial_s2[:,i], int(data_2_subs.shape[2]/3))
           f3, Pxx_den3 = signal.welch(data_trial_s3[:,i], int(data_2_subs.shape[2]/3))
           SPFV1=np.append(SPFV1, (Pxx_den1, Pxx_den2, Pxx_den3))
+      print("SHAPE OF SPFV1"+ str(SPFV1.shape))
 
       #Haar wavelet
 
@@ -330,19 +336,24 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
             cD4_a=autocorr(cD4)
             cA=[np.var(cD1),np.var(cD2),np.var(cD3),np.var(cD4_a),np.var(cD5_a),np.var(cD6_a), np.mean(np.absolute(cD1)), np.mean(np.absolute(cD2)), np.mean(np.absolute(cD3))]
             HWDFV=np.append(HWDFV, cA)
+            print("SHAPE OF HWDV IN X"+ str(HWDFV.shape))
+      print("SHAPE OF HWDV"+ str(HWDFV.shape))
 
       '''HWDFV1=np.array([])
       for i in range(0, data_train.shape[1]):
           (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           HWDFV1=np.append(HWDFV1, cA)'''
 
-
+      #
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_train.shape[1]):
           for x in range(f_split):
             f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
             SPFV=np.append(SPFV, Pxx_den)
+            print("SHAPE OF SPFV IN X"+ str(SPFV.shape))
+      print("SHAPE OF SPFV"+ str(SPFV.shape))
+
           
       '''HUFV = np.array([])    
       for i in range(0, data_train.shape[1]):
@@ -354,6 +365,9 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         for x in range(f_split):
           pfd=pyeeg.pfd(data_trial_s[x][:,i])
           PFDFV = np.append(PFDFV, pfd)
+          print("SHAPE OF PFDFV IN X"+ str(PFDFV.shape))
+      print("SHAPE OF PFDFV"+ str(PFDFV.shape))
+
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
@@ -361,18 +375,24 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         for x in range(f_split):
           dfa=pyeeg.dfa(data_trial_s[x][:,i])
           DFAFV = np.append(DFAFV, dfa)
+          print("SHAPE OF DFAFV IN X"+ str(DFAFV.shape))
+      print("SHAPE OF DFAFV"+ str(DFAFV.shape))
         
       MNFV = np.array([])
       for i in range(0, data_train.shape[1]):
         for x in range(f_split):
           mn=np.mean(data_trial_s[x][:,i])
           MNFV = np.append(MNFV, mn)
+          print("SHAPE OF MNFV IN X"+ str(MNFV.shape))
+      print("SHAPE OF MNFV"+ str(MNFV.shape))
         
       STDFV = np.array([])
       for i in range(0, data_train.shape[1]):
         for x in range(f_split):
           sd=np.std(data_trial_s[x][:,i])
           STDFV = np.append(STDFV, sd)
+          print("SHAPE OF STDFV IN X"+ str(STDFV.shape))
+      print("SHAPE OF STDFV"+ str(STDFV.shape))
         
       MT1FV=np.array([])
       for i in range(0, data_train.shape[1]):
@@ -484,9 +504,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
           #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           f = max_psd(data_trial_s_h[x][:,i])
           MPSFVH = np.append(MPSFVH, f)
-          
-          
-          
+      
       '''CORFV = np.array([])
       for i in range(0, data_train.shape[1]):
         cor=nolds.corr_dim(data_trial[:,i],1)
@@ -505,7 +523,8 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
           final= np.hstack((final, concated))
       print(j)
   print("THE NEW FEATURES")
-  print(final.shape)
+  print("final shape "+str(final.shape))
+  #print(final.shape)
 
   final=final.T
 
@@ -513,7 +532,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   eegData_ls=[]
   for d in range(f_split):
     eegData_ls.append(eegData[:,d*int(data_2_subs.shape[2]/f_split):(d+1)*int(data_2_subs.shape[2]/f_split),:])
-                              
+  print("EEGDATA SHAPE: "+str(eegData_ls[0].shape))                           
   #eegData.shape
 
 
@@ -642,6 +661,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
     print(j)
 
   final=np.hstack((final, HTFV))
+  print("The final shape is: "+str(HTFV.shape))
   #final.shape
   '''#bandpass filter
   b, a = signal.butter(2, 0.4, 'low', analog=False)
@@ -1100,7 +1120,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   nfeatures_37=spikeNum_res.shape[1]
   nfeatures_38=sharpSpike_res.shape[1]
   nfeatures_39=bandPwr_gamma.shape[1]
-  #nfeatures_38=HTFV_temp.shape[0]
+  nfeatures_40=HTFV_temp.shape[0]
   '''nfeatures_16=bandPwr_alpha.shape[0]
   nfeatures_17=bandPwr_beta.shape[0]
   nfeatures_18=bandPwr_gamma.shape[0]
@@ -1149,13 +1169,15 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
   llim38=llim37+nfeatures_37
   llim39=llim38+nfeatures_38
   llim40=llim39+nfeatures_39
+  llim41=llim40+nfeatures_40
   #llim23=llim22+nfeatures_22
   #llim24=llim23+nfeatures_23
   #llim25=llim24+nfeatures_24
 
-  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24,llim25,llim26,llim27,llim28,llim29,llim30,llim31,llim32,llim33,llim34,llim35,llim36,llim37,llim38,llim39,llim40]
-  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24,nfeatures_25,nfeatures_26,nfeatures_27,nfeatures_28,nfeatures_29,nfeatures_30,nfeatures_31,nfeatures_32,nfeatures_33,nfeatures_34,nfeatures_35,nfeatures_36,nfeatures_37,nfeatures_38,nfeatures_39]
-
+  llim=[llim1, llim2, llim3, llim4, llim5, llim6, llim7, llim8, llim9, llim10, llim11, llim12, llim13, llim14, llim15, llim16, llim17, llim18,llim19,llim20,llim21,llim22,llim23,llim24,llim25,llim26,llim27,llim28,llim29,llim30,llim31,llim32,llim33,llim34,llim35,llim36,llim37,llim38,llim39,llim40,llim41]
+  nfeatures=[nfeatures_1, nfeatures_2,nfeatures_3,nfeatures_4,nfeatures_5,nfeatures_6,nfeatures_7,nfeatures_8,nfeatures_9,nfeatures_10,nfeatures_11,nfeatures_12,nfeatures_13,nfeatures_14,nfeatures_15,nfeatures_16,nfeatures_17,nfeatures_18,nfeatures_19,nfeatures_20,nfeatures_21,nfeatures_22,nfeatures_23,nfeatures_24,nfeatures_25,nfeatures_26,nfeatures_27,nfeatures_28,nfeatures_29,nfeatures_30,nfeatures_31,nfeatures_32,nfeatures_33,nfeatures_34,nfeatures_35,nfeatures_36,nfeatures_37,nfeatures_38,nfeatures_39,nfeatures_40]
+  print("SHAPE BEFORE L_FEAT: "+str(final.shape))
+  print("SHAPE TEST BEFORE L_FEAT: "+str(final_t.shape))
   for i, lf in enumerate(l_feat):
     print("trial"+str(lf))
     if(i==0):
@@ -1171,6 +1193,9 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
   final=final[:,numpl]
   final_t=final_t[:,numpl]
+
+  print("SHAPE AFTER L_FEAT: "+str(final.shape))
+  print("SHAPE TEST AFTER L_FEAT: "+str(final_t.shape))
 
   print(final.shape)
 
