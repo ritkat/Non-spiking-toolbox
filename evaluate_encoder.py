@@ -1165,7 +1165,7 @@ def individual(args):
             best_params_ie[str(k)]=[]
 
         for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:], 1000, l_feat, False)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
