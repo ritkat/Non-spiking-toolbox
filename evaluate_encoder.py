@@ -113,8 +113,8 @@ def genetic(args):
       gen[str(k)]=[]  
     for k in range(args.gen+1):
       genstd[str(k)]=[]  
-
-    df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop, 1000, l_feat, True)
+    f_split=args.f_split
+    df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
     print(np.amax(df_train_temp.values))
     print(np.amin(df_train_temp.values))
     # Without feature selection check accuracy with Random forest
@@ -212,8 +212,9 @@ def genetic(args):
       gen[str(k)]=[]  
     for k in range(args.gen+1):
       genstd[str(k)]=[]  
+    f_split=args.f_split
     for train_index, test_index in kf3.split(data_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], 1000, l_feat, True)
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,1000, l_feat, True)
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
@@ -563,9 +564,10 @@ def individual(args):
             acc[str(k)]=[]
         for k in range(data_train_loop.shape[1]):
             best_params_ie[str(k)]=[]
-
+            
+        f_split=args.f_split
         for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:], 1000, l_feat, False)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
@@ -682,10 +684,10 @@ def individual(args):
             sd[str(k)]=[] 
         for k in range(data_train_loop.shape[1]):
             best_params_ie[str(k)]=[]
-        
+        f_split=args.f_split
         for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
             for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:], 1000, l_feat, False)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:],f_split, 1000, l_feat, False)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
@@ -724,9 +726,10 @@ def individual(args):
             accf[str(k)]=[]  
         for k in range(n_features):
             sdf[str(k)]=[]  
+        f_split=args.f_split
         for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
             for i in range(n_features):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], 1000, [i], True)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 1000, [i], True)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
                 if(args.classifier=="RF"):
@@ -815,8 +818,8 @@ def topn_elec(args):
         labels_train_loop=label_data[str(args.tstep)]
         data_test_loop=testing_data[str(args.tstep)]
         labels_test_loop=label_data_test[str(args.tstep)]
-
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop, 1000, l_feat, True)
+        f_split=args.f_split
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
