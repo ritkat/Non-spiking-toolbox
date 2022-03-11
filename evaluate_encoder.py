@@ -599,9 +599,9 @@ def individual(args):
         accf={}
         for k in range(n_features):
             accf[str(k)]=[]  
-        
+        f_split=args.f_split
         for i in range(n_features):
-            df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop, 1000, [i], True)
+            df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, [i], True)
             print(np.amax(df_train_temp.values))
             print(np.amin(df_train_temp.values))
             if(args.classifier=="RF"):
