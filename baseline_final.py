@@ -25,10 +25,10 @@ if __name__ == '__main__':
         seed = 50
         random.seed(seed)
         np.random.seed(seed)
-        df = pd.DataFrame({"dataset":[],"l_feat":[],"tstep":[], "accuracy":[], "accuracy std":[],"generation":[], "max_features":[],"gen accuracy":[], "gen std":[],"selected features":[], "nfeatures":[], "params":[]})
+        df = pd.DataFrame({"dataset":[],"f_split":[],"l_feat":[],"tstep":[], "accuracy":[], "accuracy std":[],"generation":[], "max_features":[],"gen accuracy":[], "gen std":[],"selected features":[], "nfeatures":[], "params":[]})
 
         parameters = dict(dataset=["jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"],
-        tstep=[500, 1000], maxft=[5], classifier=["RF"],l_feat=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]]
+        tstep=[500, 1000], maxft=[5], classifier=["RF"],f_split=[2,3],l_feat=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]]
         )
 
         n_generations=2
@@ -38,10 +38,10 @@ if __name__ == '__main__':
 
         param_values = [v for v in parameters.values()]
 
-        for args.dataset,args.tstep,args.max_feat,args.classifier,args.l_feat in product(*param_values):
+        for args.dataset,args.tstep,args.max_feat,args.classifier,args.f_split,args.l_feat in product(*param_values):
             accd, gen, self, nfeat, sd, genstd, params=genetic(args)
             for n in range(args.gen+1):
-                df = df.append({"dataset":args.dataset,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":accd, "accuracy std":sd,"generation":n, "max_features":args.max_feat,"gen accuracy":gen[str(n)],"gen std":genstd[str(n)],"selected features":self,"nfeatures":nfeat, "params":params},ignore_index=True)
+                df = df.append({"dataset":args.dataset,"f_split":args.f_split,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":accd, "accuracy std":sd,"generation":n, "max_features":args.max_feat,"gen accuracy":gen[str(n)],"gen std":genstd[str(n)],"selected features":self,"nfeatures":nfeat, "params":params},ignore_index=True)
                 log_file_name = 'accuracy_log_'+args.dataset+'.csv'
                 pwd = os.getcwd()
                 log_dir = pwd+'/log_dir/'
