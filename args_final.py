@@ -30,7 +30,7 @@ def args():
         "--niter", default=200, type=int, help="Dataset(BCI3)"
     )
     parser.add_argument(
-        "--nfeatures", default=17, type=int, help="Dataset(BCI3)"
+        "--nfeatures", default=36, type=int, help="Dataset(BCI3)"
     )
     parser.add_argument(
         "--f_split", default=2, type=int, help="Dataset(BCI3)"
