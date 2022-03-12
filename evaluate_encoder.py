@@ -826,7 +826,7 @@ def topn_elec(args):
         rf = RandomForestClassifier()
         '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
         clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
-        df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,  1000, l_feat, True)
+        df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,f_split, 1000, l_feat, True)
         rf.fit(df_train.values, labels_train_loop)
         
         # Without feature selection check auuracy with Random forest
@@ -854,9 +854,29 @@ def topn_elec(args):
         f15=nfeatures[14]/n_electrodes
         f16=nfeatures[15]/n_electrodes
         f17=nfeatures[16]/n_electrodes
+        f18=nfeatures[17]/n_electrodes
+        f19=nfeatures[18]/n_electrodes
+        f20=nfeatures[19]/n_electrodes
+        f21=nfeatures[20]/n_electrodes
+        f22=nfeatures[21]/n_electrodes
+        f23=nfeatures[22]/n_electrodes
+        f24=nfeatures[23]/n_electrodes
+        f25=nfeatures[24]/n_electrodes
+        f26=nfeatures[25]/n_electrodes
+        f27=nfeatures[26]/n_electrodes
+        f28=nfeatures[27]/n_electrodes
+        f29=nfeatures[28]/n_electrodes
+        f30=nfeatures[29]/n_electrodes
+        f31=nfeatures[30]/n_electrodes
+        f32=nfeatures[31]/n_electrodes
+        f33=nfeatures[32]/n_electrodes
+        f34=nfeatures[33]/n_electrodes
+        f35=nfeatures[34]/n_electrodes
+        f36=nfeatures[35]/n_electrodes
+        
 
 
-        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17]
+        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36]
 
 
         def create_dictionary(keys):
@@ -901,7 +921,7 @@ def topn_elec(args):
         for i in range(0,data_train_loop.shape[1]):
             print("iteration"+str(i))
 
-        l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+        l_feat=args.l_feat
         acc=[]
         best_params=[]
         for i in range(data_train.shape[1]):
@@ -1010,9 +1030,28 @@ def topn_elec(args):
         f15=nfeatures[14]/n_electrodes
         f16=nfeatures[15]/n_electrodes
         f17=nfeatures[16]/n_electrodes
+        f18=nfeatures[17]/n_electrodes
+        f19=nfeatures[18]/n_electrodes
+        f20=nfeatures[19]/n_electrodes
+        f21=nfeatures[20]/n_electrodes
+        f22=nfeatures[21]/n_electrodes
+        f23=nfeatures[22]/n_electrodes
+        f24=nfeatures[23]/n_electrodes
+        f25=nfeatures[24]/n_electrodes
+        f26=nfeatures[25]/n_electrodes
+        f27=nfeatures[26]/n_electrodes
+        f28=nfeatures[27]/n_electrodes
+        f29=nfeatures[28]/n_electrodes
+        f30=nfeatures[29]/n_electrodes
+        f31=nfeatures[30]/n_electrodes
+        f32=nfeatures[31]/n_electrodes
+        f33=nfeatures[32]/n_electrodes
+        f34=nfeatures[33]/n_electrodes
+        f35=nfeatures[34]/n_electrodes
+        f36=nfeatures[35]/n_electrodes
 
 
-        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17]
+        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36]
 
 
         def create_dictionary(keys):
