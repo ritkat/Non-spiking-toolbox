@@ -1208,7 +1208,7 @@ def individual(args):
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop)
                 predictions = clf.predict(df_test_temp.values)
-                accf[str(i)].append(metrics.accuracy_score(labels_train_loop,predictions))
+                accf[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
             elif(args.classifier=="SVM"):
                 object=StandardScaler()
                 object.fit(df_train_temp)
