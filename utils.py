@@ -1205,7 +1205,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
   return df_train, df_test
 
-def createFV_individual_feat(data_train, fs, l_feat, c_ref):
+def createFV_individual_feat(data_train, f_split,fs, l_feat, c_ref):
 
   #subsampling by 4 
   
