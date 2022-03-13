@@ -812,6 +812,7 @@ def topn_elec(args):
         label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
         segment_length=[500,1000,1500,3000]
         l_feat=args.l_feat 
+        f_split=args.f_split
         n_iter=args.niter
 
         data_train_loop=training_data[str(args.tstep)]
@@ -922,13 +923,14 @@ def topn_elec(args):
             print("iteration"+str(i))
 
         l_feat=args.l_feat
+        f_split=args.f_split
         acc=[]
         best_params=[]
         for i in range(data_train.shape[1]):
             if(i==0):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:], 1000, l_feat, False) 
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False) 
             else:
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,list(topn[0:i+1]),:], data_test_loop[:,list(topn[0:i+1]),:], 1000, l_feat, True)
+                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,list(topn[0:i+1]),:], data_test_loop[:,list(topn[0:i+1]),:],f_split, 1000, l_feat, True)
             # Without feature selection check auuracy with Random forest
             if(args.classifier=="RF"):
                 rf = RandomForestClassifier()
@@ -960,6 +962,7 @@ def topn_elec(args):
         data_train_ib = data_ib["X"]
         labels_train_ib = data_ib["y"]
         l_feat=args.l_feat
+        f_split=args.f_split
         #500 Tstep
         data_train_ib_500=segment(data_train_ib, segment_length=500)
         print(np.amax(data_train_ib_500))
