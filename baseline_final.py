@@ -204,10 +204,10 @@ if __name__ == '__main__':
            
 
     elif(args.method=="topn_elec"):
-        df = pd.DataFrame({"dataset":[],"l_feat":[],"tstep":[],"accuracy":[],"std":[],"classifier":[],"best_params":[]})
+        df = pd.DataFrame({"dataset":[],"f_split":[],"l_feat":[],"tstep":[],"accuracy":[],"std":[],"classifier":[],"best_params":[]})
 
         parameters = dict(dataset=["bci3"],
-        tstep=[500],classifier=["SVM","RF"],l_feat=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]]
+        tstep=[500],classifier=["SVM","RF"],f_split=[2,3],l_feat=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]]
         )
 
         n_generations=10
@@ -217,10 +217,10 @@ if __name__ == '__main__':
         args.niter=200
 
         param_values = [v for v in parameters.values()]
-        for args.dataset,args.tstep,args.classifier,args.l_feat in product(*param_values):
+        for args.dataset,args.tstep,args.classifier,args.f_split,args.l_feat in product(*param_values):
             acc,best_params,sd=topn_elec(args)
             #for n in range(args.gen+1):
-            df = df.append({"dataset":args.dataset,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":acc, "std":sd,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
+            df = df.append({"dataset":args.dataset,"f_split":args.f_split,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":acc, "std":sd,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
             log_file_name = 'accuracy_topn_log_'+str(args.dataset)+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
@@ -243,14 +243,14 @@ if __name__ == '__main__':
         parameters = dict(dataset=["bci3", "jc_mot"],
         tstep=[3000]
         )
-        df = pd.DataFrame({"dataset":[],"tstep":[],"llim":[],"nfeatures":[], "electrodes":[]})
+        df = pd.DataFrame({"dataset":[],"f_split":[],"l_feat":[],"tstep":[],"llim":[],"nfeatures":[], "electrodes":[]})
         param_values = [v for v in parameters.values()]
         for args.dataset,args.tstep in product(*param_values):
-            l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+            l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
             #args.gen=n_generations
             args.l_feat=l_feat
             llim, nfeatures, elec = topn_feat(args)
-            df = df.append({"dataset":args.dataset,"tstep":args.tstep,"llim":llim, "nfeatures":nfeatures, "electrodes":elec},ignore_index=True)
+            df = df.append({"dataset":args.dataset,"f_split":args.f_split,"l_feat":args.l_feat,"tstep":args.tstep,"llim":llim, "nfeatures":nfeatures, "electrodes":elec},ignore_index=True)
             log_file_name = 'accuracy_topn_log_'+str(args.dataset)+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
