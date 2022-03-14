@@ -344,7 +344,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
           (cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
           HWDFV1=np.append(HWDFV1, cA)'''
 
-      #
+      #add frequences till 100
       #Spectral Power estimates
       SPFV=np.array([])
       for i in range(0, data_train.shape[1]):
