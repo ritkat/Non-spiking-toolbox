@@ -315,7 +315,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       SPFV=np.array([])
       for i in range(0, data_train.shape[1]):
           for x in range(f_split):
-            f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
+            f, Pxx_den = signal.welch(data_trial_s[x][:,i], fs)
             SPFV=np.append(SPFV, (Pxx_den))
           
       '''HUFV = np.array([])    
@@ -675,7 +675,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       SPFV=np.array([])
       for i in range(0, data_2_subs_t.shape[1]):
           for x in range(f_split):
-            f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
+            f, Pxx_den = signal.welch(data_trial_s[x][:,i], fs)
             SPFV=np.append(SPFV, (Pxx_den))
           
       '''HUFV = np.array([])    
@@ -1238,7 +1238,7 @@ def createFV_individual_feat(data_train, f_split,fs, l_feat, c_ref):
       SPFV=np.array([])
       for i in range(0, data_train.shape[1]):
           for x in range(f_split):
-            f, Pxx_den = signal.welch(data_trial_s[x][:,i], int(data_2_subs.shape[2]/3))
+            f, Pxx_den = signal.welch(data_trial_s[x][:,i], fs)
             SPFV=np.append(SPFV, (Pxx_den))
           
       '''HUFV = np.array([])    
