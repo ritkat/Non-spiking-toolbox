@@ -1,1941 +1,558 @@
-from utils import*
+# Author: Nikhil Garg
+# Organization: 3IT & NECOTIS,
+# Université de Sherbrooke, Canada
+
+import itertools
+import random
+import logging
 import numpy as np
-import pandas as pd
-import time
-import statsmodels.api as sm
-from scipy import signal
-from sklearn.preprocessing import StandardScaler
-import EEGExtract as eeg
-import pywt
-from scipy.signal import hilbert, chirp
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier 
-# Import the RFE from sklearn library
-from sklearn.feature_selection import RFE,SelectFromModel
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from genetic_selection import GeneticSelectionCV
-import seaborn as sns
 import os
-import numpy as np
-import pandas as pd
-import time
-import statsmodels.api as sm
-from scipy import signal
-from sklearn.preprocessing import StandardScaler
-import EEGExtract as eeg
-import pywt
-from scipy.signal import hilbert, chirp
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold
-from sklearn.model_selection import StratifiedKFold
-import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier 
-# Import the RFE from sklearn library
-from sklearn.feature_selection import RFE,SelectFromModel
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-#from genetic_selection import GeneticSelectionCV
-import seaborn as sns
-import os
-from sklearn import svm
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.decomposition import PCA
+from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import roc_auc_score
+import gc
+import matplotlib.pyplot as plt
+import time
+from utilis import *
+from args import args as my_args
+from encode import *
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import seaborn as sns
+import scikitplot as skplt
+from sklearn.model_selection import cross_val_predict
+from sklearn.ensemble import RandomForestClassifier 
+from sklearn.feature_selection import RFE,SelectFromModel
+from sklearn.model_selection import train_test_split
+from sklearn import metrics as metrics
+from genetic_selection import GeneticSelectionCV
 from sklearn.model_selection import RandomizedSearchCV
-from args_final import args as my_args
-
-args=my_args()
-
-def genetic(args):
-  if(args.dataset=="bci3"):
-    data=np.load('./data/bci_3.npz')
-    data_train=data["X"]
-    data_test=data["X_test"]
-    labels=data['events']
-    truelabels=np.loadtxt("./true_labels.txt", delimiter="/n")
-    data_train_ib_500=segment(data_train, segment_length=500)
-    segment_length=500
-    labels_train_ib_500=np.repeat(labels,3000/int(segment_length))
-
-    data_test_ib_500=segment(data_test, segment_length=500)
-    segment_length=500
-    labels_test_ib_500=np.repeat(truelabels,3000/int(segment_length))
-
-    #1000 Tstep
-    data_train_ib_1000=segment(data_train, segment_length=1000)
-    segment_length=1000
-    labels_train_ib_1000=np.repeat(labels,3000/int(segment_length))
-
-    data_test_ib_1000=segment(data_test, segment_length=1000)
-    segment_length=1000
-    labels_test_ib_1000=np.repeat(truelabels,3000/int(segment_length))
-
-    #1500 Tstep
-    data_train_ib_1500=segment(data_train, segment_length=1500)
-    segment_length=1500
-    labels_train_ib_1500=np.repeat(labels,3000/int(segment_length))
-
-    data_test_ib_1500=segment(data_test, segment_length=1500)
-    segment_length=1500
-    labels_test_ib_1500=np.repeat(truelabels,3000/int(segment_length))
-
-    data_train_ib_3000=data_train
-    segment_length=3000
-    labels_train_ib_3000=labels
-
-    data_test_ib_3000=data_test
-    segment_length=3000
-    labels_test_ib_3000=truelabels
-
-    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-    testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
-    label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
-    segment_length=[500,1000,1500,3000]
-    l_feat=args.l_feat 
-
-    data_train_loop=training_data[str(args.tstep)]
-    labels_train_loop=label_data[str(args.tstep)]
-    data_test_loop=testing_data[str(args.tstep)]
-    labels_test_loop=label_data_test[str(args.tstep)]
-
-    acc=[]
-    l_feat=args.l_feat
-
-    gen={}
-    genstd={}
-    sel=[]
-    #n_generations=40
-    for k in range(args.gen+1):
-      gen[str(k)]=[]  
-    for k in range(args.gen+1):
-      genstd[str(k)]=[]  
-    f_split=args.f_split
-    df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
-    print(np.amax(df_train_temp.values))
-    print(np.amin(df_train_temp.values))
-    # Without feature selection check accuracy with Random forest
-    if args.classifier=="RF":
-      estimator = RandomForestClassifier()
-    else:
-      object=StandardScaler()
-      object.fit(df_train_temp)
-      df_train_temp = object.transform(df_train_temp) 
-      df_test_temp=object.transform(df_test_temp) 
-      estimator=svm.SVC()
-    selector = GeneticSelectionCV(
-    estimator,
-    cv=5,
-    verbose=1,
-    scoring="accuracy",
-    max_features=args.max_feat,
-    n_population=300,
-    crossover_proba=0.5,
-    mutation_proba=0.2,
-    n_generations=args.gen,
-    crossover_independent_proba=0.5,
-    mutation_independent_proba=0.05,
-    tournament_size=3,
-    n_gen_no_change=None,
-    caching=True,
-    n_jobs=-1,)
-    selector = selector.fit(df_train_temp.values, labels_train_loop)
-    params=selector.estimator_
-    tempo=np.where(selector.support_.astype(int)==1)[0]
-    sel.append(tempo)
-
-    acc.append(selector.score(df_test_temp.values, labels_test_loop))
-    for k in range(args.gen+1):
-      gen[str(k)].append(selector.generation_scores_[k])
-
-    self=sel
-    nfeat=len(self[0])
-    accd=acc
-    sd=0
-    for k in range(args.gen+1):
-      gen[str(k)]=sum(gen[str(k)])/len(gen[str(k)])
-    for k in range(args.gen+1):
-      genstd[str(k)]=0
-
-    return accd, gen, self, nfeat, sd, genstd, params
-
-  elif(args.dataset=="speech"):
-    data_ib=np.load('./data/speech.npz')
-    data_train_ib = data_ib["X_Train"]
-    labels_train_ib = data_ib["Y_Train"]
-    #500 Tstep
-    data_train_ib_500, rep=segment_speech(data_train_ib, segment_length=500)
-    print(np.amax(data_train_ib_500))
-    print(np.amin(data_train_ib_500))
-
-    segment_length=500
-    labels_train_ib_500=repeater(labels_train_ib, rep)
-
-    #1000 Tstep
-    data_train_ib_1000, rep=segment_speech(data_train_ib, segment_length=1000)
-    segment_length=1000
-    labels_train_ib_1000=repeater(labels_train_ib, rep)
-
-    #1500 Tstep
-    '''data_train_ib_1500=segment_speech(data_train_ib, segment_length=1500)
-    segment_length=1500
-    labels_train_ib_1500=repeater(labels_train_ib, rep)
-
-    #3000 Tstep
-    data_train_ib_3000=data_train_ib
-    segment_length=3000
-    labels_train_ib_3000=labels_train_ib'''
-
-    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000}
-    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000}
-    segment_length=[500,1000]
-
-    kf3 = KFold(n_splits=5, shuffle=False)
-
-    #print("iteration "+str(i))
-    data_train_loop=training_data[str(args.tstep)]
-    labels_train_loop=label_data[str(args.tstep)]
-    #fs=int(segment_length[i]/3)
-    acc=[]
-    l_feat=args.l_feat
-    gen={}
-    genstd={}
-    sel=[]
-    #n_generations=40
-    for k in range(args.gen+1):
-      gen[str(k)]=[]  
-    for k in range(args.gen+1):
-      genstd[str(k)]=[]  
-    f_split=args.f_split
-    for train_index, test_index in kf3.split(data_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,3052, l_feat, True)
-        print(np.amax(df_train_temp.values))
-        print(np.amin(df_train_temp.values))
-        # Without feature selection check accuracy with Random forest
-        if args.classifier=="RF":        
-          estimator = RandomForestClassifier(n_estimators=800)
-        else:
-          object=StandardScaler()
-          object.fit(df_train_temp)
-          df_train_temp = object.transform(df_train_temp) 
-          df_test_temp=object.transform(df_test_temp) 
-          estimator=svm.SVC(gamma="auto")
-        selector = GeneticSelectionCV(
-        estimator,
-        cv=5,
-        verbose=1,
-        scoring="accuracy",
-        max_features=args.max_feat,
-        n_population=300,
-        crossover_proba=0.5,
-        mutation_proba=0.2,
-        n_generations=args.gen,
-        crossover_independent_proba=0.5,
-        mutation_independent_proba=0.05,
-        tournament_size=3,
-        n_gen_no_change=None,
-        caching=True,
-        n_jobs=-1,)
-        selector = selector.fit(df_train_temp.values, labels_train_loop[train_index])
-        params=selector.estimator_
-        tempo=np.where(selector.support_.astype(int)==1)[0]
-        sel.append(tempo)
-
-        acc.append(selector.score(df_test_temp.values, labels_train_loop[test_index]))
-        for k in range(args.gen+1):
-          gen[str(k)].append(selector.generation_scores_[k])
-    
-    self=sel[1]
-    nfeat=self.shape[0]
-    accd=sum(acc)/len(acc)
-    sd=np.std(acc)
-    for k in range(args.gen+1):
-      genstd[str(k)]=np.std(gen[str(k)])
-    for k in range(args.gen+1):
-      gen[str(k)]=sum(gen[str(k)])/len(gen[str(k)])
+from sklearn import svm
+# import autosklearn.classification
 
 
-    
+def evaluate_encoder(args):
 
-    return accd, gen, self, nfeat, sd, genstd, params
+    nbInputs = 64
+    seed = 500
+    random.seed(seed)
+    np.random.seed(seed)
+    print(args.__dict__)
 
+    spike_times_train_up_list, spike_times_train_dn_list, spike_times_test_up_list, spike_times_test_dn_list, X_Train_list,X_Test_list, Y_Train_list,Y_Test_list,avg_spike_rate_list = encode(args)
+    svm_score_input_list,rf_score_input_list, svm_score_baseline_list, svm_score_comb_list, rf_score_comb_list, acc_list, sel_list, gen_list, nfeat_list, rf_score_individual_input_list=[],[],[],[],[],[],[],[],[],[]
+    if args.dataset=="bci3":
 
-  else:
+        nbtimepoints = int(args.duration / args.tstep)
 
-    data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
-    data_train_ib = data_ib["X"]
-    labels_train_ib = data_ib["y"]
-    #500 Tstep
-    data_train_ib_500=segment(data_train_ib, segment_length=500)
-    print(np.amax(data_train_ib_500))
-    print(np.amin(data_train_ib_500))
-
-    segment_length=500
-    labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-    #1000 Tstep
-    data_train_ib_1000=segment(data_train_ib, segment_length=1000)
-    segment_length=1000
-    labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
-
-    #1500 Tstep
-    data_train_ib_1500=segment(data_train_ib, segment_length=1500)
-    segment_length=1500
-    labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-    #3000 Tstep
-    data_train_ib_3000=data_train_ib
-    segment_length=3000
-    labels_train_ib_3000=labels_train_ib
-
-    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-    segment_length=[500,1000,1500,3000]
+        spike_rate_array_all_input_train = np.ones((nbInputs, nbtimepoints)) * -1  # Dummy spike counts. Would be discarded in last lines
+        spike_rate_array_all_input_test = np.ones((nbInputs, nbtimepoints)) * -1
 
 
-    kf3 = KFold(n_splits=5, shuffle=False)
-    #accd={}
+        #Training
+        spike_times_up = spike_times_train_up_list[0]
+        spike_times_dn = spike_times_train_dn_list[0]
+        labels = Y_Train_list[0]
+        label_list = []
 
-    #print("iteration "+str(i))
-    data_train_loop=training_data[str(args.tstep)]
-    labels_train_loop=label_data[str(args.tstep)]
-    #fs=int(segment_length[i]/3)
-    acc=[]
-    l_feat=args.l_feat
-    gen={}
-    genstd={}
-    sel=[]
-    #n_generations=40
-    for k in range(args.gen+1):
-      gen[str(k)]=[]  
-    for k in range(args.gen+1):
-      genstd[str(k)]=[]  
-    f_split=args.f_split
-    for train_index, test_index in kf3.split(data_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,1000, l_feat, True)
-        print(np.amax(df_train_temp.values))
-        print(np.amin(df_train_temp.values))
-        # Without feature selection check accuracy with Random forest
-        if args.classifier=="RF":        
-          estimator = RandomForestClassifier(n_estimators=800)
-        else:
-          object=StandardScaler()
-          object.fit(df_train_temp)
-          df_train_temp = object.transform(df_train_temp) 
-          df_test_temp=object.transform(df_test_temp) 
-          estimator=svm.SVC(gamma="auto")
-        selector = GeneticSelectionCV(
-        estimator,
-        cv=5,
-        verbose=1,
-        scoring="accuracy",
-        max_features=args.max_feat,
-        n_population=300,
-        crossover_proba=0.5,
-        mutation_proba=0.2,
-        n_generations=args.gen,
-        crossover_independent_proba=0.5,
-        mutation_independent_proba=0.05,
-        tournament_size=3,
-        n_gen_no_change=None,
-        caching=True,
-        n_jobs=-1,)
-        selector = selector.fit(df_train_temp.values, labels_train_loop[train_index])
-        params=selector.estimator_
-        tempo=np.where(selector.support_.astype(int)==1)[0]
-        sel.append(tempo)
+        for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
+            # print(iteration)
+            times, indices = convert_data_add_format(sample_time_up, sample_time_down)
+            rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
+                                                            time_array=np.array(times),
+                                                            duration=args.tlast, tstep=args.tstep, nbneurons=nbInputs)
 
-        acc.append(selector.score(df_test_temp.values, labels_train_loop[test_index]))
-        for k in range(args.gen+1):
-          gen[str(k)].append(selector.generation_scores_[k])
-    
-    self=sel[1]
-    nfeat=self.shape[0]
-    accd=sum(acc)/len(acc)
-    sd=np.std(acc)
-    for k in range(args.gen+1):
-      genstd[str(k)]=np.std(gen[str(k)])
-    for k in range(args.gen+1):
-      gen[str(k)]=sum(gen[str(k)])/len(gen[str(k)])
+            spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
+            label_list.append(np.array(labels[iteration]))
+            gc.collect()
+
+        spike_rate_array_all_input_train = spike_rate_array_all_input_train[:,:,1:]
+
+        X_input_train, Y_input_train = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_train, label_array=label_list,
+                                                        tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+        print("Number of Train samples : ")
+        print(len(X_input_train))
+
+        
+        # Testing
+        spike_times_up = spike_times_test_up_list[0]
+        spike_times_dn = spike_times_test_dn_list[0]
+        labels = Y_Test_list[0]
+        label_list = []
+        #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
+        for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
+            #TODO: do a TQDM progress bar here
+            # print(iteration)
+            times, indices = convert_data_add_format(sample_time_up, sample_time_down)
+
+            rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
+                                                                time_array=np.array(times),
+                                                                duration=3000, tstep=args.tstep, nbneurons=nbInputs)
+
+            spike_rate_array_all_input_test = np.dstack((spike_rate_array_all_input_test, rate_array_input))
+            label_list.append(np.array(labels[iteration]))
+            gc.collect()
+
+        spike_rate_array_all_input_test=spike_rate_array_all_input_test[:,:,1:]
+        
+        X_input_test, Y_input_test = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_test, label_array=label_list,
+                                                        tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+        
+        print("Number of Test samples : ")
+        print(len(X_input_test))
 
 
-    
+        X_Train_segmented, Y_Train_segmented = segment(X_Train_list[0], Y_Train_list[0],tstep= args.tstep, tstart=0, tstop=args.tlast)
+        print(len(X_Train_segmented))
+        X_Train_segmented=np.array(X_Train_segmented)
+        Y_Train_segmented=np.array(Y_Train_segmented)
+        X_Test_segmented, Y_Test_segmented = segment(X_Test_list[0], Y_Test_list[0], tstep=args.tstep, tstart=0, tstop=args.tlast)
+        X_Test_segmented=np.array(X_Test_segmented)
+        Y_Test_segmented=np.array(Y_Test_segmented)
+        X_train = np.mean(X_Train_segmented, axis=1)
+        X_test = np.mean(X_Test_segmented, axis=1)
+        Y_train = Y_Train_segmented
+        Y_test = Y_Test_segmented
 
-    return accd, gen, self, nfeat, sd, genstd, params
 
-def baseline(args):
-  if args.dataset=="bci3":
-    data=np.load('./data/bci_3.npz')
-    data_train=data["X"]
-    data_test=data["X_test"]
-    labels=data['events']
-    truelabels=np.loadtxt("./true_labels.txt", delimiter="/n")
-    data_train_ib_500=segment(data_train, segment_length=500)
-    segment_length=500
-    labels_train_ib_500=np.repeat(labels,3000/int(segment_length))
-
-    data_test_ib_500=segment(data_test, segment_length=500)
-    segment_length=500
-    labels_test_ib_500=np.repeat(truelabels,3000/int(segment_length))
-
-    #1000 Tstep
-    data_train_ib_1000=segment(data_train, segment_length=1000)
-    segment_length=1000
-    labels_train_ib_1000=np.repeat(labels,3000/int(segment_length))
-
-    data_test_ib_1000=segment(data_test, segment_length=1000)
-    segment_length=1000
-    labels_test_ib_1000=np.repeat(truelabels,3000/int(segment_length))
-
-    #1500 Tstep
-    data_train_ib_1500=segment(data_train, segment_length=1500)
-    segment_length=1500
-    labels_train_ib_1500=np.repeat(labels,3000/int(segment_length))
-
-    data_test_ib_1500=segment(data_test, segment_length=1500)
-    segment_length=1500
-    labels_test_ib_1500=np.repeat(truelabels,3000/int(segment_length))
-
-    data_train_ib_3000=data_train
-    segment_length=3000
-    labels_train_ib_3000=labels
-
-    data_test_ib_3000=data_test
-    segment_length=3000
-    labels_test_ib_3000=truelabels
-
-    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-    testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
-    label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
-    segment_length=[500,1000,1500,3000]
-    l_feat=args.l_feat 
-    n_iter=args.niter
-    f_split=args.f_split
-
-    data_train_loop=training_data[str(args.tstep)]
-    labels_train_loop=label_data[str(args.tstep)]
-    data_test_loop=testing_data[str(args.tstep)]
-    labels_test_loop=label_data_test[str(args.tstep)]
-
-    df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
-    print(np.amax(df_train_temp.values))
-    print(np.amin(df_train_temp.values))
-    # Without feature selection check accuracy with Random forest
-    if(args.classifier=="RF"):
-        rf = RandomForestClassifier()
-        distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
-        clf.fit(df_train_temp.values, labels_train_loop)
-        best_params=clf.best_params_
-        pred = clf.predict(df_test_temp.values)
-        acc=metrics.accuracy_score(labels_test_loop,pred)
-        sd=0
-    elif(args.classifier=="SVM"):
-        object=StandardScaler()
-        object.fit(df_train_temp)
-        df_train_temp = object.transform(df_train_temp) 
-        df_test_temp=object.transform(df_test_temp) 
+        '''
+        Input model for evaluating spike rates features obtained from temporal difference encoding
+        '''
+        n_iter=args.niter
         svma=svm.SVC()
         distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-        clf = RandomizedSearchCV(svma, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
-        clf.fit(df_train_temp, labels_train_loop)
-        best_params=clf.best_params_
-        pred = clf.predict(df_test_temp)
-        acc=metrics.accuracy_score(labels_test_loop,pred)
-        sd=0
+        clf = RandomizedSearchCV(svma, distributions, random_state=0)
+        clf.fit(X_input_train, Y_input_train)
+        prediction = clf.predict(X_input_test)
+        svm_score_input=metrics.accuracy_score(Y_input_test,prediction)
+        print("ONEODNE")
 
-    return acc,sd, best_params
 
-  elif(args.dataset=="speech"):
-    data_ib=np.load('./data/speech.npz')
-    data_train_ib = data_ib["X_Train"]
-    labels_train_ib = data_ib["Y_Train"]
-    #500 Tstep
-    data_train_ib_500, rep=segment_speech(data_train_ib, segment_length=500)
-    print(np.amax(data_train_ib_500))
-    print(np.amin(data_train_ib_500))
+        print("Input test accuraccy")
+        print(svm_score_input)
 
-    segment_length=500
-    labels_train_ib_500=repeater(labels_train_ib, rep)
-
-    #1000 Tstep
-    data_train_ib_1000, rep=segment_speech(data_train_ib, segment_length=1000)
-    segment_length=1000
-    labels_train_ib_1000=repeater(labels_train_ib, rep)
-
-    '''#1500 Tstep
-    data_train_ib_1500=segment_speech(data_train_ib, segment_length=1500)
-    segment_length=1500
-    labels_train_ib_1500=repeater(labels_train_ib, rep)
-
-    #3000 Tstep
-    data_train_ib_3000=data_train_ib
-    segment_length=3000
-    labels_train_ib_3000=labels_train_ib'''
-
-    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000}
-    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000}
-    segment_length=[500,1000]
-
-
-    kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-    #accd={}
-
-    #print("iteration "+str(i))
-    data_train_loop=training_data[str(args.tstep)]
-    labels_train_loop=label_data[str(args.tstep)]
-    #fs=int(segment_length[i]/3)
-    acc=[]
-    l_feat=args.l_feat 
-    n_iter=args.niter
-    f_split=args.f_split
-    for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 3052, l_feat, True)
-        print(np.amax(df_train_temp.values))
-        print(np.amin(df_train_temp.values))
-        # Without feature selection check accuracy with Random forest
-        if(args.classifier=="RF"):
-            rf = RandomForestClassifier()
-            distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-            clf.fit(df_train_temp.values, labels_train_loop[train_index])
-            best_params=clf.best_params_
-            pred = clf.predict(df_test_temp.values)
-            acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
-        elif(args.classifier=="SVM"):
-            object=StandardScaler()
-            object.fit(df_train_temp)
-            df_train_temp = object.transform(df_train_temp) 
-            df_test_temp=object.transform(df_test_temp) 
-            svma=svm.SVC()
-            distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-            clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-            clf.fit(df_train_temp, labels_train_loop[train_index])
-            best_params=clf.best_params_
-            pred = clf.predict(df_test_temp)
-            acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
-    
-    sd=np.std(acc)
-    accd=sum(acc)/len(acc)
-    
-
-    
-
-    return accd, sd, best_params
-    
-  else:
-    data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
-    data_train_ib = data_ib["X"]
-    labels_train_ib = data_ib["y"]
-    #500 Tstep
-    data_train_ib_500=segment(data_train_ib, segment_length=500)
-    print(np.amax(data_train_ib_500))
-    print(np.amin(data_train_ib_500))
-
-    segment_length=500
-    labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-    #1000 Tstep
-    data_train_ib_1000=segment(data_train_ib, segment_length=1000)
-    segment_length=1000
-    labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
-
-    #1500 Tstep
-    data_train_ib_1500=segment(data_train_ib, segment_length=1500)
-    segment_length=1500
-    labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-    #3000 Tstep
-    data_train_ib_3000=data_train_ib
-    segment_length=3000
-    labels_train_ib_3000=labels_train_ib
-
-    training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-    label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-    segment_length=[500,1000,1500,3000]
-
-
-    kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-    #accd={}
-
-    #print("iteration "+str(i))
-    data_train_loop=training_data[str(args.tstep)]
-    labels_train_loop=label_data[str(args.tstep)]
-    #fs=int(segment_length[i]/3)
-    acc=[]
-    l_feat=args.l_feat 
-    n_iter=args.niter
-    f_split=args.f_split
-    for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,1000, l_feat, True)
-        print(np.amax(df_train_temp.values))
-        print(np.amin(df_train_temp.values))
-        # Without feature selection check accuracy with Random forest
-        if(args.classifier=="RF"):
-            rf = RandomForestClassifier()
-            distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-            clf.fit(df_train_temp.values, labels_train_loop[train_index])
-            best_params=clf.best_params_
-            pred = clf.predict(df_test_temp.values)
-            acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
-        elif(args.classifier=="SVM"):
-            object=StandardScaler()
-            object.fit(df_train_temp)
-            df_train_temp = object.transform(df_train_temp) 
-            df_test_temp=object.transform(df_test_temp) 
-            svma=svm.SVC()
-            distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-            clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-            clf.fit(df_train_temp, labels_train_loop[train_index])
-            best_params=clf.best_params_
-            pred = clf.predict(df_test_temp)
-            acc.append(metrics.accuracy_score(labels_train_loop[test_index],pred))
-    
-    sd=np.std(acc)
-    accd=sum(acc)/len(acc)
-    
-
-    
-
-    return accd, sd, best_params
-
-
-def individual(args):
-    if(args.dataset=="bci3"):
-        data=np.load('./data/bci_3.npz')
-        data_train=data["X"]
-        data_test=data["X_test"]
-        labels=data['events']
-        truelabels=np.loadtxt("./true_labels.txt", delimiter="/n")
-        data_train_ib_500=segment(data_train, segment_length=500)
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_500=segment(data_test, segment_length=500)
-        segment_length=500
-        labels_test_ib_500=np.repeat(truelabels,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1000=segment(data_test, segment_length=1000)
-        segment_length=1000
-        labels_test_ib_1000=np.repeat(truelabels,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1500=segment(data_test, segment_length=1500)
-        segment_length=1500
-        labels_test_ib_1500=np.repeat(truelabels,3000/int(segment_length))
-
-        data_train_ib_3000=data_train
-        segment_length=3000
-        labels_train_ib_3000=labels
-
-        data_test_ib_3000=data_test
-        segment_length=3000
-        labels_test_ib_3000=truelabels
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
-        label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
-        segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        n_iter=args.niter
-
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        data_test_loop=testing_data[str(args.tstep)]
-        labels_test_loop=label_data_test[str(args.tstep)]
-
-        acc={}
-        best_params_ie={}
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=[]
-        for k in range(data_train_loop.shape[1]):
-            best_params_ie[str(k)]=[]
-            
-        f_split=args.f_split
-        for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop)
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp.values)
-                    acc[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop)
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp)
-                    acc[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-            # Without feature selection check accuracy with Random forest    
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)]) 
-
-
-        n_features=args.nfeatures
-        accf={}
-        for k in range(n_features):
-            accf[str(k)]=[]  
-        f_split=args.f_split
-        for i in range(n_features):
-            df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, [i], True)
-            print(np.amax(df_train_temp.values))
-            print(np.amin(df_train_temp.values))
-            if(args.classifier=="RF"):
-                rf = RandomForestClassifier()
-                distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                clf.fit(df_train_temp.values, labels_train_loop)
-                predictions = clf.predict(df_test_temp.values)
-                accf[str(i)].append(metrics.accuracy_score(labels_train_loop,predictions))
-            elif(args.classifier=="SVM"):
-                object=StandardScaler()
-                object.fit(df_train_temp)
-                df_train_temp = object.transform(df_train_temp) 
-                df_test_temp=object.transform(df_test_temp) 
-                svma=svm.SVC()
-                distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                clf.fit(df_train_temp, labels_train_loop)          
-                predictions = clf.predict(df_test_temp)
-                accf[str(i)].append(metrics.accuracy_score(labels_train_loop,predictions))
-        # Without feature selection check accuracy with Random forest    
-        for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)]) 
-            
-        sd=0
-        sdf=0
-
-        return acc, sd, accf, sdf, best_params_ie
-
-    elif(args.dataset=="speech"):
-        data_ib=np.load('./data/speech.npz')
-        data_train_ib = data_ib["X_Train"]
-        labels_train_ib = data_ib["Y_Train"]
-        #500 Tstep
-        data_train_ib_500, rep=segment_speech(data_train_ib, segment_length=500)
-        print(np.amax(data_train_ib_500))
-        print(np.amin(data_train_ib_500))
-
-        segment_length=500
-        labels_train_ib_500=repeater(labels_train_ib, rep)
-
-        #1000 Tstep
-        data_train_ib_1000, rep=segment_speech(data_train_ib, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=repeater(labels_train_ib, rep)
-
-        '''#1500 Tstep
-        data_train_ib_1500=segment_speech(data_train_ib, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=repeater(labels_train_ib, rep)
-
-        #3000 Tstep
-        data_train_ib_3000=data_train_ib
-        segment_length=3000
-        labels_train_ib_3000=labels_train_ib'''
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000}
-        segment_length=[500,1000]
-
-
-        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        #fs=int(segment_length[i]/3)
-        acc={}
-        sd={}
-        best_params_ie={}
-        l_feat=args.l_feat
-        n_iter=args.niter
-        #n_generations=40
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=[]
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=[] 
-        for k in range(data_train_loop.shape[1]):
-            best_params_ie[str(k)]=[]
-        f_split=args.f_split
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:],f_split, 1000, l_feat, False)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp.values)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest   
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=np.std(acc[str(k)])
-        '''for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)])'''
-            
-
-
-        n_features=args.nfeatures
-        accf={}
-        
-        sdf={}
-        for k in range(n_features):
-            accf[str(k)]=[]  
-        for k in range(n_features):
-            sdf[str(k)]=[]  
-        f_split=args.f_split
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            for i in range(n_features):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 1000, [i], True)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])                
-                    predictions = clf.predict(df_test_temp.values)
-                    accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])                
-                    predictions = clf.predict(df_test_temp)
-                    accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest  
-        for k in range(n_features):
-            sdf[str(k)]=np.std(accf[str(k)])
-        '''for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])'''
-        
-
-
-        
-
-        return acc, sd, accf, sdf, best_params_ie
-
-    else:
-        data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
-        data_train_ib = data_ib["X"]
-        labels_train_ib = data_ib["y"]
-        #500 Tstep
-        data_train_ib_500=segment(data_train_ib, segment_length=500)
-        print(np.amax(data_train_ib_500))
-        print(np.amin(data_train_ib_500))
-
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train_ib, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train_ib, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #3000 Tstep
-        data_train_ib_3000=data_train_ib
-        segment_length=3000
-        labels_train_ib_3000=labels_train_ib
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        segment_length=[500,1000,1500,3000]
-
-
-        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-        #accd={}
-
-        #print("iteration "+str(i))
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        #fs=int(segment_length[i]/3)
-        acc={}
-        sd={}
-        best_params_ie={}
-        l_feat=args.l_feat
-        n_iter=args.niter
-        #n_generations=40
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=[]
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=[] 
-        for k in range(data_train_loop.shape[1]):
-            best_params_ie[str(k)]=[]
-        f_split=args.f_split
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:],f_split, 1000, l_feat, False)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp.values)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest   
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=np.std(acc[str(k)])
-        '''for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)])'''
-            
-
-
-        n_features=args.nfeatures
-        accf={}
-        
-        sdf={}
-        for k in range(n_features):
-            accf[str(k)]=[]  
-        for k in range(n_features):
-            sdf[str(k)]=[]  
-        f_split=args.f_split
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            for i in range(n_features):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 1000, [i], True)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])                
-                    predictions = clf.predict(df_test_temp.values)
-                    accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])                
-                    predictions = clf.predict(df_test_temp)
-                    accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest  
-        for k in range(n_features):
-            sdf[str(k)]=np.std(accf[str(k)])
-        '''for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])'''
-        
-
-
-        
-
-        return acc, sd, accf, sdf, best_params_ie
-      
-  
-        #sb="jc_mot"
-    
-def topn_elec(args):
-    if args.dataset=="bci3":
-        data=np.load('./data/bci_3.npz')
-        data_train=data["X"]
-        data_test=data["X_test"]
-        labels=data['events']
-        truelabels=np.loadtxt("./true_labels.txt", delimiter="/n")
-        data_train_ib_500=segment(data_train, segment_length=500)
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_500=segment(data_test, segment_length=500)
-        segment_length=500
-        labels_test_ib_500=np.repeat(truelabels,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1000=segment(data_test, segment_length=1000)
-        segment_length=1000
-        labels_test_ib_1000=np.repeat(truelabels,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1500=segment(data_test, segment_length=1500)
-        segment_length=1500
-        labels_test_ib_1500=np.repeat(truelabels,3000/int(segment_length))
-
-        data_train_ib_3000=data_train
-        segment_length=3000
-        labels_train_ib_3000=labels
-
-        data_test_ib_3000=data_test
-        segment_length=3000
-        labels_test_ib_3000=truelabels
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
-        label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
-        segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        f_split=args.f_split
-        n_iter=args.niter
-
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        data_test_loop=testing_data[str(args.tstep)]
-        labels_test_loop=label_data_test[str(args.tstep)]
-        f_split=args.f_split
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
-        print(np.amax(df_train_temp.values))
-        print(np.amin(df_train_temp.values))
-        # Without feature selection check accuracy with Random forest
         rf = RandomForestClassifier()
-        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
-        df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,f_split, 1000, l_feat, True)
-        rf.fit(df_train.values, labels_train_loop)
-        
-        # Without feature selection check auuracy with Random forest
+        distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
+        #print("THESHAPE OF X_input_train"+len(X_input_train))
+        clf.fit(X_input_train, Y_input_train)
+        prediction = clf.predict(X_input_test)
+        rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
 
-        importances = rf.feature_importances_
+        gen={}
+        sel=[]
+        for k in range(args.gen+1):
+            gen[str(k)]=[]
+        estimator = RandomForestClassifier()
+        selector = GeneticSelectionCV(
+        estimator,
+        cv=5,
+        verbose=1,
+        scoring="accuracy",
+        max_features=5,
+        n_population=300,
+        crossover_proba=0.5,
+        mutation_proba=0.2,
+        n_generations=args.gen,
+        crossover_independent_proba=0.5,
+        mutation_independent_proba=0.05,
+        tournament_size=3,
+        n_gen_no_change=10,
+        caching=True,
+        n_jobs=100,)
+        selector = selector.fit(X_input_train, Y_input_train)
+        acc=selector.score(X_input_test, Y_input_test)
+        tempo=np.where(selector.support_.astype(int)==1)[0]
+        sel=tempo
+        for k in range(args.gen+1):
+            gen[str(k)].append(selector.generation_scores_[k])
+        nfeat=sel.shape[0]
 
-        #importance per electrode
-        n_electrodes=data_train_loop.shape[1]
-        #dictionary of features
-        #nfeatures=[]
-        f1=nfeatures[0]/n_electrodes
-        f2=nfeatures[1]/n_electrodes
-        f3=nfeatures[2]/n_electrodes
-        f4=nfeatures[3]/n_electrodes
-        f5=nfeatures[4]/n_electrodes
-        f6=nfeatures[5]/n_electrodes
-        f7=nfeatures[6]/n_electrodes
-        f8=nfeatures[7]/n_electrodes
-        f9=nfeatures[8]/n_electrodes
-        f10=nfeatures[9]/n_electrodes
-        f11=nfeatures[10]/n_electrodes
-        f12=nfeatures[11]/n_electrodes
-        f13=nfeatures[12]/n_electrodes
-        f14=nfeatures[13]/n_electrodes
-        f15=nfeatures[14]/n_electrodes
-        f16=nfeatures[15]/n_electrodes
-        f17=nfeatures[16]/n_electrodes
-        f18=nfeatures[17]/n_electrodes
-        f19=nfeatures[18]/n_electrodes
-        f20=nfeatures[19]/n_electrodes
-        f21=nfeatures[20]/n_electrodes
-        f22=nfeatures[21]/n_electrodes
-        f23=nfeatures[22]/n_electrodes
-        f24=nfeatures[23]/n_electrodes
-        f25=nfeatures[24]/n_electrodes
-        f26=nfeatures[25]/n_electrodes
-        f27=nfeatures[26]/n_electrodes
-        f28=nfeatures[27]/n_electrodes
-        f29=nfeatures[28]/n_electrodes
-        f30=nfeatures[29]/n_electrodes
-        f31=nfeatures[30]/n_electrodes
-        f32=nfeatures[31]/n_electrodes
-        f33=nfeatures[32]/n_electrodes
-        f34=nfeatures[33]/n_electrodes
-        f35=nfeatures[34]/n_electrodes
-        f36=nfeatures[35]/n_electrodes
-        
-
-
-        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36]
-
-
-        def create_dictionary(keys):
-            result = {} # empty dictionary
-            for key in keys:
-                result[key] = []
-            return result
-
-        keys=[]
-        for i in range(0, data_train_loop.shape[1]):
-            keys.append("e"+str(i))
-
-        electrodes=create_dictionary(keys)
-        #electrodes={"e0":[], "e1":[], "e2":[], "e3":[], "e4":[], "e5":[], "e6":[], "e7":[]}
-        count=0
-        llim=0
-        for i in range(0, len(f)):
-            count=0
-            for j in range(llim,llim+nfeatures[i], int(f[i])):
-                electrodes["e"+str(count)].append(np.sum(importances[j:j+int(f[i])]))
-                #print(i)
-                #print(count)
-                count=count+1
-            llim=llim+nfeatures[i]
-
-        for e in electrodes:
-            electrodes[str(e)]=sum(electrodes[str(e)])
-
-        final_df = pd.DataFrame({"Electrodes": electrodes.keys(), "Importances":electrodes.values()})
-        final_df["main"]=np.arange(data_train_loop.shape[1])
-        temp_df=final_df.sort_values(by='Importances', ascending=False)
-        topn=temp_df.values[:,2]
-        print("topn electrodes :",topn)
-        #print("topn electrodes datatype :", topn.dtype)
-
-        keys=[]
-        for i in range(0, data_train_loop.shape[1]):
-            keys.append(str(i+1))
-
-        accuracy=create_dictionary(keys)
-
-        for i in range(0,data_train_loop.shape[1]):
-            print("iteration"+str(i))
-
-        l_feat=args.l_feat
-        f_split=args.f_split
-        acc=[]
-        best_params=[]
-        for i in range(data_train.shape[1]):
-            if(i==0):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False) 
+        print("THIS")
+        X_input_train_n = np.array(X_input_train)
+        for i in range(0,len(X_input_train)):
+            if i==0:
+                X_input_train_n=X_input_train[0]
             else:
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,list(topn[0:i+1]),:], data_test_loop[:,list(topn[0:i+1]),:],f_split, 1000, l_feat, True)
-            # Without feature selection check auuracy with Random forest
-            if(args.classifier=="RF"):
-                rf = RandomForestClassifier()
-                distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                clf.fit(df_train_temp.values, labels_train_loop)
-                y_pred_rf_w = clf.predict(df_test_temp.values)
-                best_params.append(clf.best_params_)
-                acc.append(metrics.accuracy_score(labels_test_loop,y_pred_rf_w))
-            elif(args.classifier=="SVM"):
-                object=StandardScaler()
-                object.fit(df_train_temp)
-                df_train_temp = object.transform(df_train_temp) 
-                df_test_temp=object.transform(df_test_temp)  
-                svma=svm.SVC()
-                distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                clf.fit(df_train_temp, labels_train_loop)
-                y_pred_rf_w = clf.predict(df_test_temp)
-                best_params.append(clf.best_params_)
-                acc.append(metrics.accuracy_score(labels_test_loop,y_pred_rf_w))
+                X_input_train_n=np.vstack((X_input_train_n, X_input_train[i]))
+        print(X_input_train_n.shape)
+        
+        X_input_test_n = np.array(X_input_test)
+        for i in range(0,len(X_input_test)):
+            if i==0:
+                X_input_test_n=X_input_test[0]
+            else:
+                X_input_test_n=np.vstack((X_input_test_n, X_input_test[i]))
+    
 
-        sd=0
-
-        return acc, best_params, sd
-
-    elif(args.dataset=="speech"):
-        data_ib=np.load('./data/speech.npz')
-        data_train_ib = data_ib["X_Train"]
-        labels_train_ib = data_ib["Y_Train"]
-        #500 Tstep
-        data_train_ib_500, rep=segment_speech(data_train_ib, segment_length=500)
-        print(np.amax(data_train_ib_500))
-        print(np.amin(data_train_ib_500))
-
-        segment_length=500
-        labels_train_ib_500=repeater(labels_train_ib, rep)
-
-        #1000 Tstep
-        data_train_ib_1000, rep=segment_speech(data_train_ib, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=repeater(labels_train_ib, rep)
-
-        '''#1500 Tstep
-        data_train_ib_1500=segment_speech(data_train_ib, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=repeater(labels_train_ib, rep)
-
-        #3000 Tstep
-        data_train_ib_3000=data_train_ib
-        segment_length=3000
-        labels_train_ib_3000=labels_train_ib'''
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000}
-        segment_length=[500,1000]
+        X_input_train_comb=np.hstack((X_input_train_n, X_train))
+        X_input_test_comb=np.hstack((X_input_test_n, X_test))
 
 
-        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-
-        #fs=int(segment_length[i]/3)
+        svma=svm.SVC()
+        distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
+        clf = RandomizedSearchCV(svma, distributions, random_state=0)
+        clf.fit(X_input_train_comb, Y_input_train)
+        prediction = clf.predict(X_input_test_comb)
+        svm_score_comb=metrics.accuracy_score(Y_input_test,prediction)
 
         rf = RandomForestClassifier()
-        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
-        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        rf.fit(df_train.values, labels_train_loop)
+        distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
+        clf.fit(X_input_train_comb, Y_input_train)
+        #print("THESHAPE OF X_input_train"+len(X_input_train))
+        prediction = clf.predict(X_input_test_comb)
+        rf_score_comb=metrics.accuracy_score(Y_input_test,prediction)
+
+        rf_score_individual_input=[]
+        for i in range(X_input_train_n.shape[1]):
+            X_temp_input=X_input_train_n[:,i]
+            X_temp_input=np.reshape(X_temp_input, (X_input_train_n.shape[0],1))
+            X_temp_input_test=X_input_test_n[:,i]
+            X_temp_input_test=np.reshape(X_temp_input_test, (X_input_test_n.shape[0],1))
+            rf = RandomForestClassifier()
+            distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=100,n_jobs=-1)
+            clf.fit(X_temp_input, Y_input_train)
+            #print("THESHAPE OF X_input_train"+len(X_input_train))
+            y_pred_rf_w = clf.predict(X_temp_input_test)
+            rf_score_individual_input.append(metrics.accuracy_score(Y_input_test,y_pred_rf_w))
+
+
         
-        # Without feature selection check auuracy with Random forest
-
-        importances = rf.feature_importances_
-        print(importances)
-
-        n_electrodes=data_train_loop.shape[1]
-        #dictionary of features
-        #nfeatures=[]
-        f1=nfeatures[0]/n_electrodes
-        f2=nfeatures[1]/n_electrodes
-        f3=nfeatures[2]/n_electrodes
-        f4=nfeatures[3]/n_electrodes
-        f5=nfeatures[4]/n_electrodes
-        f6=nfeatures[5]/n_electrodes
-        f7=nfeatures[6]/n_electrodes
-        f8=nfeatures[7]/n_electrodes
-        f9=nfeatures[8]/n_electrodes
-        f10=nfeatures[9]/n_electrodes
-        f11=nfeatures[10]/n_electrodes
-        f12=nfeatures[11]/n_electrodes
-        f13=nfeatures[12]/n_electrodes
-        f14=nfeatures[13]/n_electrodes
-        f15=nfeatures[14]/n_electrodes
-        f16=nfeatures[15]/n_electrodes
-        f17=nfeatures[16]/n_electrodes
-        f18=nfeatures[17]/n_electrodes
-        f19=nfeatures[18]/n_electrodes
-        f20=nfeatures[19]/n_electrodes
-        f21=nfeatures[20]/n_electrodes
-        f22=nfeatures[21]/n_electrodes
-        f23=nfeatures[22]/n_electrodes
-        f24=nfeatures[23]/n_electrodes
-        f25=nfeatures[24]/n_electrodes
-        f26=nfeatures[25]/n_electrodes
-        f27=nfeatures[26]/n_electrodes
-        f28=nfeatures[27]/n_electrodes
-        f29=nfeatures[28]/n_electrodes
-        f30=nfeatures[29]/n_electrodes
-        f31=nfeatures[30]/n_electrodes
-        f32=nfeatures[31]/n_electrodes
-        f33=nfeatures[32]/n_electrodes
-        f34=nfeatures[33]/n_electrodes
-        f35=nfeatures[34]/n_electrodes
-        f36=nfeatures[35]/n_electrodes
+        '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
+        cls_auto.fit(X_input_train_comb, Y_input_train)
+        predictions = cls_auto.predict(X_input_test_comb)
+        from sklearn import metrics
+        auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
 
 
-        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36]
+        '''pwd = os.getcwd()
+        plot_dir = pwd + '/plots/'
+        plt.rcParams.update({'font.size': 16})
+        #Confusion matrix
+        predictions = clf_input.predict(X_input_test)
+        ax = skplt.metrics.plot_confusion_matrix(Y_input_test, predictions, normalize=True)
+        plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'confusion'+'.svg')
+        plt.clf()
+        #ROC curve
+        predicted_probas = clf_input.predict_proba(X_input_test)
+        ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
+        plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
+        plt.clf()'''
 
 
-        def create_dictionary(keys):
-            result = {} # empty dictionary
-            for key in keys:
-                result[key] = []
-            return result
+        '''
+        Baseline model for evaluating time domain averaged features obtained from raw signals
+        '''
+        clf_baseline = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
+        clf_baseline.fit(X_train, Y_train)
+        #print("THESHAPE OF X_train"+str(X_train.shape))
+        svm_score_baseline = clf_baseline.score(X_test, Y_test)
+        print("Baseline accuraccy")
+        print(svm_score_baseline)
+        
 
-        keys=[]
-        for i in range(0, data_train_loop.shape[1]):
-            keys.append("e"+str(i))
 
-        electrodes=create_dictionary(keys)
-        #electrodes={"e0":[], "e1":[], "e2":[], "e3":[], "e4":[], "e5":[], "e6":[], "e7":[]}
-        count=0
-        llim=0
-        for i in range(0, len(f)):
-            count=0
-            for j in range(llim,llim+nfeatures[i], int(f[i])):
-                electrodes["e"+str(count)].append(np.sum(importances[j:j+int(f[i])]))
-                #print(i)
-                #print(count)
-                count=count+1
-            llim=llim+nfeatures[i]
 
-        for e in electrodes:
-            electrodes[str(e)]=sum(electrodes[str(e)])
+        
 
-        final_df = pd.DataFrame({"Electrodes": electrodes.keys(), "Importances":electrodes.values()})
-        final_df["main"]=np.arange(data_train_loop.shape[1])
-        temp_df=final_df.sort_values(by='Importances', ascending=False)
-        topn=temp_df.values[:,2]
-        print("topn electrodes :",topn)
-        #print("topn electrodes datatype :", topn.dtype)
 
-        keys=[]
-        for i in range(0, data_train_loop.shape[1]):
-            keys.append(str(i+1))
+        #Confusion matrix
+        '''predictions = clf_baseline.predict(X_test)
+        ax = skplt.metrics.plot_confusion_matrix(Y_test, predictions, normalize=True)
+        plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'confusion'+'.svg')
+        plt.clf()
+        #ROC curve
+        predicted_probas = clf_baseline.predict_proba(X_test)
+        ax2 = skplt.metrics.plot_roc(Y_test, predicted_probas)
+        plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'roc'+'.svg')
+        plt.clf()'''
+        
+        
 
-        accuracy=create_dictionary(keys)
+        #plot_dataset(X=X_test,y=Y_test,fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_raw_test',args=args)
+        #plot_dataset(X=np.array(X_input_test),y=np.array(Y_input_test),fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_decoded_test',args=args)
+        np.savez_compressed(
+            'spike_data.npz',
+            X=np.array(X_input_test),
+            Y_Train=np.array(Y_input_test)
+        )
 
-        for i in range(0,data_train_loop.shape[1]):
-            print("iteration"+str(i))
 
-        l_feat=args.l_feat
-        acc={}
-        best_params={}
-        sd={}
-        for i in range(data_train_loop.shape[1]):
-            acc[str(i)]=[]
-        for i in range(data_train_loop.shape[1]):
-            best_params[str(i)]=[]
-        for i in range(data_train_loop.shape[1]):
-            sd[str(i)]=[]
-
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            data_train=data_train_loop[train_index]
-            data_test=data_train_loop[test_index]
-            for i in range(data_train_loop.shape[1]):
-                if(i==0):
-                    df_train_temp, df_test_temp=createFV_individual(data_train[:,np.newaxis,i,:], data_test[:,np.newaxis,i,:], 1000, l_feat, False)
-                
-                else:
-                    df_train_temp, df_test_temp=createFV_individual(data_train[:,list(topn[0:i+1]),:], data_test[:,list(topn[0:i+1]),:], 1000, l_feat, True)
-                # Without feature selection check auuracy with Random forest
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])
-                    y_pred_rf_w = clf.predict(df_test_temp.values)
-                    best_params[str(i)].append(clf.best_params_)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],y_pred_rf_w))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])
-                    y_pred_rf_w = clf.predict(df_test_temp)
-                    best_params[str(i)].append(clf.best_params_)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],y_pred_rf_w))
-
-        for i in range(data_train_loop.shape[1]):
-            sd[str(i)]=np.std(acc[str(i)])
-        return acc, best_params, sd
-
+        return svm_score_input,rf_score_input,avg_spike_rate, svm_score_baseline, svm_score_comb, rf_score_comb, acc, sel, gen, nfeat, rf_score_individual_input# auto_score
 
     else:
-        data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
-        data_train_ib = data_ib["X"]
-        labels_train_ib = data_ib["y"]
-        l_feat=args.l_feat
-        f_split=args.f_split
-        #500 Tstep
-        data_train_ib_500=segment(data_train_ib, segment_length=500)
-        print(np.amax(data_train_ib_500))
-        print(np.amin(data_train_ib_500))
+        #spike_times_train_up, spike_times_train_dn, spike_times_test_up, spike_times_test_dn, X_Train,X_Test, Y_Train,Y_Test,avg_spike_rate = encode(args)
+        for k in range(args.kfold):
+            nbtimepoints = int(args.duration / args.tstep)
 
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train_ib, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train_ib, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #3000 Tstep
-        data_train_ib_3000=data_train_ib
-        segment_length=3000
-        labels_train_ib_3000=labels_train_ib
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        n_iter=args.niter
+            spike_rate_array_all_input_train = np.ones((nbInputs, nbtimepoints)) * -1  # Dummy spike counts. Would be discarded in last lines
+            spike_rate_array_all_input_test = np.ones((nbInputs, nbtimepoints)) * -1
 
 
-        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-        #accd={}
+            #Training
+            spike_times_up = spike_times_train_up_list[k]
+            spike_times_dn = spike_times_train_dn_list[k]
+            labels = Y_Train_list[k]
+            label_list = []
 
-        #print("iteration "+str(i))
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
+            for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
+                # print(iteration)
+                times, indices = convert_data_add_format(sample_time_up, sample_time_down)
+                rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
+                                                                time_array=np.array(times),
+                                                                duration=args.tlast, tstep=args.tstep, nbneurons=nbInputs)
 
-        #fs=int(segment_length[i]/3)
+                spike_rate_array_all_input_train=np.dstack((spike_rate_array_all_input_train,rate_array_input))
+                label_list.append(np.array(labels[iteration]))
+                gc.collect()
 
-        rf = RandomForestClassifier()
-        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
-        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        rf.fit(df_train.values, labels_train_loop)
-        
-        # Without feature selection check auuracy with Random forest
+            spike_rate_array_all_input_train = spike_rate_array_all_input_train[:,:,1:]
 
-        importances = rf.feature_importances_
-        print(importances)
+            X_input_train, Y_input_train = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_train, label_array=label_list,
+                                                            tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+            print("Number of Train samples : ")
+            print(len(X_input_train))
 
-        n_electrodes=data_train_loop.shape[1]
-        #dictionary of features
-        #nfeatures=[]
-        f1=nfeatures[0]/n_electrodes
-        f2=nfeatures[1]/n_electrodes
-        f3=nfeatures[2]/n_electrodes
-        f4=nfeatures[3]/n_electrodes
-        f5=nfeatures[4]/n_electrodes
-        f6=nfeatures[5]/n_electrodes
-        f7=nfeatures[6]/n_electrodes
-        f8=nfeatures[7]/n_electrodes
-        f9=nfeatures[8]/n_electrodes
-        f10=nfeatures[9]/n_electrodes
-        f11=nfeatures[10]/n_electrodes
-        f12=nfeatures[11]/n_electrodes
-        f13=nfeatures[12]/n_electrodes
-        f14=nfeatures[13]/n_electrodes
-        f15=nfeatures[14]/n_electrodes
-        f16=nfeatures[15]/n_electrodes
-        f17=nfeatures[16]/n_electrodes
-        f18=nfeatures[17]/n_electrodes
-        f19=nfeatures[18]/n_electrodes
-        f20=nfeatures[19]/n_electrodes
-        f21=nfeatures[20]/n_electrodes
-        f22=nfeatures[21]/n_electrodes
-        f23=nfeatures[22]/n_electrodes
-        f24=nfeatures[23]/n_electrodes
-        f25=nfeatures[24]/n_electrodes
-        f26=nfeatures[25]/n_electrodes
-        f27=nfeatures[26]/n_electrodes
-        f28=nfeatures[27]/n_electrodes
-        f29=nfeatures[28]/n_electrodes
-        f30=nfeatures[29]/n_electrodes
-        f31=nfeatures[30]/n_electrodes
-        f32=nfeatures[31]/n_electrodes
-        f33=nfeatures[32]/n_electrodes
-        f34=nfeatures[33]/n_electrodes
-        f35=nfeatures[34]/n_electrodes
-        f36=nfeatures[35]/n_electrodes
-
-
-        f=[f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36]
-
-
-        def create_dictionary(keys):
-            result = {} # empty dictionary
-            for key in keys:
-                result[key] = []
-            return result
-
-        keys=[]
-        for i in range(0, data_train_loop.shape[1]):
-            keys.append("e"+str(i))
-
-        electrodes=create_dictionary(keys)
-        #electrodes={"e0":[], "e1":[], "e2":[], "e3":[], "e4":[], "e5":[], "e6":[], "e7":[]}
-        count=0
-        llim=0
-        for i in range(0, len(f)):
-            count=0
-            for j in range(llim,llim+nfeatures[i], int(f[i])):
-                electrodes["e"+str(count)].append(np.sum(importances[j:j+int(f[i])]))
-                #print(i)
-                #print(count)
-                count=count+1
-            llim=llim+nfeatures[i]
-
-        for e in electrodes:
-            electrodes[str(e)]=sum(electrodes[str(e)])
-
-        final_df = pd.DataFrame({"Electrodes": electrodes.keys(), "Importances":electrodes.values()})
-        final_df["main"]=np.arange(data_train_loop.shape[1])
-        temp_df=final_df.sort_values(by='Importances', ascending=False)
-        topn=temp_df.values[:,2]
-        print("topn electrodes :",topn)
-        #print("topn electrodes datatype :", topn.dtype)
-
-        keys=[]
-        for i in range(0, data_train_loop.shape[1]):
-            keys.append(str(i+1))
-
-        accuracy=create_dictionary(keys)
-
-        for i in range(0,data_train_loop.shape[1]):
-            print("iteration"+str(i))
-
-        l_feat=args.l_feat
-        acc={}
-        best_params={}
-        sd={}
-        for i in range(data_train_loop.shape[1]):
-            acc[str(i)]=[]
-        for i in range(data_train_loop.shape[1]):
-            best_params[str(i)]=[]
-        for i in range(data_train_loop.shape[1]):
-            sd[str(i)]=[]
-
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            data_train=data_train_loop[train_index]
-            data_test=data_train_loop[test_index]
-            for i in range(data_train_loop.shape[1]):
-                if(i==0):
-                    df_train_temp, df_test_temp=createFV_individual(data_train[:,np.newaxis,i,:], data_test[:,np.newaxis,i,:], 1000, l_feat, False)
-                
-                else:
-                    df_train_temp, df_test_temp=createFV_individual(data_train[:,list(topn[0:i+1]),:], data_test[:,list(topn[0:i+1]),:], 1000, l_feat, True)
-                # Without feature selection check auuracy with Random forest
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])
-                    y_pred_rf_w = clf.predict(df_test_temp.values)
-                    best_params[str(i)].append(clf.best_params_)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],y_pred_rf_w))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])
-                    y_pred_rf_w = clf.predict(df_test_temp)
-                    best_params[str(i)].append(clf.best_params_)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],y_pred_rf_w))
-
-        for i in range(data_train_loop.shape[1]):
-            sd[str(i)]=np.std(acc[str(i)])
-        return acc, best_params, sd
-      
-def individual(args):
-    if(args.dataset=="bci3"):
-        data=np.load('./data/bci_3.npz')
-        data_train=data["X"]
-        data_test=data["X_test"]
-        labels=data['events']
-        truelabels=np.loadtxt("./true_labels.txt", delimiter="/n")
-        data_train_ib_500=segment(data_train, segment_length=500)
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_500=segment(data_test, segment_length=500)
-        segment_length=500
-        labels_test_ib_500=np.repeat(truelabels,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1000=segment(data_test, segment_length=1000)
-        segment_length=1000
-        labels_test_ib_1000=np.repeat(truelabels,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1500=segment(data_test, segment_length=1500)
-        segment_length=1500
-        labels_test_ib_1500=np.repeat(truelabels,3000/int(segment_length))
-
-        data_train_ib_3000=data_train
-        segment_length=3000
-        labels_train_ib_3000=labels
-
-        data_test_ib_3000=data_test
-        segment_length=3000
-        labels_test_ib_3000=truelabels
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
-        label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
-        segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        n_iter=args.niter
-        f_split=args.f_split
-
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        data_test_loop=testing_data[str(args.tstep)]
-        labels_test_loop=label_data_test[str(args.tstep)]
-
-        acc={}
-        best_params_ie={}
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=[]
-        for k in range(data_train_loop.shape[1]):
-            best_params_ie[str(k)]=[]
-
-        for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop)
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp.values)
-                    acc[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop)
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp)
-                    acc[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-            # Without feature selection check accuracy with Random forest    
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)]) 
-
-
-        n_features=args.nfeatures
-        accf={}
-        for k in range(n_features):
-            accf[str(k)]=[]  
-        
-        for i in range(n_features):
-            df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, [i], True)
-            print(np.amax(df_train_temp.values))
-            print(np.amin(df_train_temp.values))
-            if(args.classifier=="RF"):
-                rf = RandomForestClassifier()
-                distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                clf.fit(df_train_temp.values, labels_train_loop)
-                predictions = clf.predict(df_test_temp.values)
-                accf[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-            elif(args.classifier=="SVM"):
-                object=StandardScaler()
-                object.fit(df_train_temp)
-                df_train_temp = object.transform(df_train_temp) 
-                df_test_temp=object.transform(df_test_temp) 
-                svma=svm.SVC()
-                distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                clf.fit(df_train_temp, labels_train_loop)          
-                predictions = clf.predict(df_test_temp)
-                accf[str(i)].append(metrics.accuracy_score(labels_train_loop,predictions))
-        # Without feature selection check accuracy with Random forest    
-        for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)]) 
             
-        sd=0
-        sdf=0
+            # Testing
+            spike_times_up = spike_times_test_up_list[k]
+            spike_times_dn = spike_times_test_dn_list[k]
+            labels = Y_Test_list[k]
+            label_list = []
+            #TODO: Vectorize and predetermine the dimension of all arrays to allocate memory at start
+            for iteration, (sample_time_up, sample_time_down) in enumerate(zip(spike_times_up, spike_times_dn)):
+                #TODO: do a TQDM progress bar here
+                # print(iteration)
+                times, indices = convert_data_add_format(sample_time_up, sample_time_down)
 
-        return acc, sd, accf, sdf, best_params_ie
+                rate_array_input = recorded_output_to_spike_rate_array(index_array=np.array(indices),
+                                                                    time_array=np.array(times),
+                                                                    duration=3000, tstep=args.tstep, nbneurons=nbInputs)
 
+                spike_rate_array_all_input_test = np.dstack((spike_rate_array_all_input_test, rate_array_input))
+                label_list.append(np.array(labels[iteration]))
+                gc.collect()
 
-
-    else:
-        data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
-        data_train_ib = data_ib["X"]
-        labels_train_ib = data_ib["y"]
-        #500 Tstep
-        data_train_ib_500=segment(data_train_ib, segment_length=500)
-        print(np.amax(data_train_ib_500))
-        print(np.amin(data_train_ib_500))
-
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train_ib, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train_ib, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #3000 Tstep
-        data_train_ib_3000=data_train_ib
-        segment_length=3000
-        labels_train_ib_3000=labels_train_ib
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        segment_length=[500,1000,1500,3000]
+            spike_rate_array_all_input_test=spike_rate_array_all_input_test[:,:,1:]
+            
+            X_input_test, Y_input_test = spike_rate_array_to_features(spike_rate_array=spike_rate_array_all_input_test, label_array=label_list,
+                                                            tstep=args.tstep, tstart=args.tstart, tlast=args.tlast)
+            
+            print("Number of Test samples : ")
+            print(len(X_input_test))
 
 
-        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-        #accd={}
+            X_Train_segmented, Y_Train_segmented = segment(X_Train_list[k], Y_Train_list[k],tstep= args.tstep, tstart=0, tstop=args.tlast)
+            print(len(X_Train_segmented))
+            X_Train_segmented=np.array(X_Train_segmented)
+            Y_Train_segmented=np.array(Y_Train_segmented)
+            X_Test_segmented, Y_Test_segmented = segment(X_Test_list[k], Y_Test_list[k], tstep=args.tstep, tstart=0, tstop=args.tlast)
+            X_Test_segmented=np.array(X_Test_segmented)
+            Y_Test_segmented=np.array(Y_Test_segmented)
+            X_train = np.mean(X_Train_segmented, axis=1)
+            X_test = np.mean(X_Test_segmented, axis=1)
+            Y_train = Y_Train_segmented
+            Y_test = Y_Test_segmented
 
-        #print("iteration "+str(i))
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        #fs=int(segment_length[i]/3)
-        acc={}
-        sd={}
-        best_params_ie={}
-        l_feat=args.l_feat
-        n_iter=args.niter
-        f_split=args.f_split
-        #n_generations=40
-        for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=[]
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=[] 
-        for k in range(data_train_loop.shape[1]):
-            best_params_ie[str(k)]=[]
+
+            '''
+            Input model for evaluating spike rates features obtained from temporal difference encoding
+            '''
+            n_iter=args.niter
+            svma=svm.SVC()
+            distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
+            clf = RandomizedSearchCV(svma, distributions, random_state=0)
+            clf.fit(X_input_train, Y_input_train)
+            prediction = clf.predict(X_input_test)
+            svm_score_input=metrics.accuracy_score(Y_input_test,prediction)
+            svm_score_input_list.append(svm_score_input)
+            print("ONEODNE")
+
+
+            print("Input test accuraccy")
+            print(svm_score_input)
+
+            rf = RandomForestClassifier()
+            distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
+            #print("THESHAPE OF X_input_train"+len(X_input_train))
+            clf.fit(X_input_train, Y_input_train)
+            prediction = clf.predict(X_input_test)
+            rf_score_input=metrics.accuracy_score(Y_input_test,prediction)
+            rf_score_input_list.append(rf_score_input)
+
+            gen={}
+            sel=[]
+            for k in range(args.gen+1):
+                gen[str(k)]=[]
+            estimator = RandomForestClassifier()
+            selector = GeneticSelectionCV(
+            estimator,
+            cv=5,
+            verbose=1,
+            scoring="accuracy",
+            max_features=5,
+            n_population=300,
+            crossover_proba=0.5,
+            mutation_proba=0.2,
+            n_generations=args.gen,
+            crossover_independent_proba=0.5,
+            mutation_independent_proba=0.05,
+            tournament_size=3,
+            n_gen_no_change=10,
+            caching=True,
+            n_jobs=100,)
+            selector = selector.fit(X_input_train, Y_input_train)
+            acc=selector.score(X_input_test, Y_input_test)
+            acc_list.append(acc)
+            tempo=np.where(selector.support_.astype(int)==1)[0]
+            sel=tempo
+            sel_list.append(sel)
+            for k in range(args.gen+1):
+                gen[str(k)].append(selector.generation_scores_[k])
+            gen_list.append(gen)
+            nfeat=sel.shape[0]
+            nfeat_list.append(nfeat)
+
+            print("THIS")
+            X_input_train_n = np.array(X_input_train)
+            for i in range(0,len(X_input_train)):
+                if i==0:
+                    X_input_train_n=X_input_train[0]
+                else:
+                    X_input_train_n=np.vstack((X_input_train_n, X_input_train[i]))
+            print(X_input_train_n.shape)
+            
+            X_input_test_n = np.array(X_input_test)
+            for i in range(0,len(X_input_test)):
+                if i==0:
+                    X_input_test_n=X_input_test[0]
+                else:
+                    X_input_test_n=np.vstack((X_input_test_n, X_input_test[i]))
         
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            for i in range(data_train_loop.shape[1]):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:],f_split,1000, l_feat, False)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp.values)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])
-                    best_params_ie[str(i)].append(clf.best_params_)
-                    predictions = clf.predict(df_test_temp)
-                    acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest   
-        for k in range(data_train_loop.shape[1]):
-            sd[str(k)]=np.std(acc[str(k)])
-        '''for k in range(data_train_loop.shape[1]):
-            acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)])'''
+
+            X_input_train_comb=np.hstack((X_input_train_n, X_train))
+            X_input_test_comb=np.hstack((X_input_test_n, X_test))
+
+
+            svma=svm.SVC()
+            distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
+            clf = RandomizedSearchCV(svma, distributions, random_state=0)
+            clf.fit(X_input_train_comb, Y_input_train)
+            prediction = clf.predict(X_input_test_comb)
+            svm_score_comb=metrics.accuracy_score(Y_input_test,prediction)
+            svm_score_comb_list.append(svm_score_comb)
+
+            rf = RandomForestClassifier()
+            distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+            clf = RandomizedSearchCV(rf, distributions, random_state=0, n_jobs=-1, n_iter=n_iter)
+            clf.fit(X_input_train_comb, Y_input_train)
+            #print("THESHAPE OF X_input_train"+len(X_input_train))
+            prediction = clf.predict(X_input_test_comb)
+            rf_score_comb=metrics.accuracy_score(Y_input_test,prediction)
+            rf_score_comb_list.append(rf_score_comb)
+
+            rf_score_individual_input=[]
+            for i in range(X_input_train_n.shape[1]):
+                X_temp_input=X_input_train_n[:,i]
+                X_temp_input=np.reshape(X_temp_input, (X_input_train_n.shape[0],1))
+                X_temp_input_test=X_input_test_n[:,i]
+                X_temp_input_test=np.reshape(X_temp_input_test, (X_input_test_n.shape[0],1))
+                rf = RandomForestClassifier()
+                distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
+                clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=100,n_jobs=-1)
+                clf.fit(X_temp_input, Y_input_train)
+                #print("THESHAPE OF X_input_train"+len(X_input_train))
+                y_pred_rf_w = clf.predict(X_temp_input_test)
+                rf_score_individual_input.append(metrics.accuracy_score(Y_input_test,y_pred_rf_w))
+            rf_score_individual_input_list.append(rf_score_individual_input)
+
+            
+            '''cls_auto = autosklearn.classification.AutoSklearnClassifier()
+            cls_auto.fit(X_input_train_comb, Y_input_train)
+            predictions = cls_auto.predict(X_input_test_comb)
+            from sklearn import metrics
+            auto_score=metrics.accuracy_score(Y_input_test, predictions)'''
+
+
+            '''pwd = os.getcwd()
+            plot_dir = pwd + '/plots/'
+            plt.rcParams.update({'font.size': 16})
+            #Confusion matrix
+            predictions = clf_input.predict(X_input_test)
+            ax = skplt.metrics.plot_confusion_matrix(Y_input_test, predictions, normalize=True)
+            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'confusion'+'.svg')
+            plt.clf()
+            #ROC curve
+            predicted_probas = clf_input.predict_proba(X_input_test)
+            ax2 = skplt.metrics.plot_roc(Y_input_test, predicted_probas)
+            plt.savefig(plot_dir+args.experiment_name+'_decoded_'+'roc'+'.svg')
+            plt.clf()'''
+
+
+            '''
+            Baseline model for evaluating time domain averaged features obtained from raw signals
+            '''
+            clf_baseline = make_pipeline(StandardScaler(), SVC(gamma='auto', probability=True))
+            clf_baseline.fit(X_train, Y_train)
+            #print("THESHAPE OF X_train"+str(X_train.shape))
+            svm_score_baseline = clf_baseline.score(X_test, Y_test)
+            svm_score_baseline_list.append(svm_score_baseline)
+            print("Baseline accuraccy")
+            print(svm_score_baseline)
             
 
 
-        n_features=args.nfeatures
-        accf={}
-        
-        sdf={}
-        for k in range(n_features):
-            accf[str(k)]=[]  
-        for k in range(n_features):
-            sdf[str(k)]=[]  
-        for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-            for i in range(n_features):
-                df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split,1000, [i], True)
-                print(np.amax(df_train_temp.values))
-                print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
-                    rf = RandomForestClassifier()
-                    distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
-                    clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp.values, labels_train_loop[train_index])                
-                    predictions = clf.predict(df_test_temp.values)
-                    accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
-                    object=StandardScaler()
-                    object.fit(df_train_temp)
-                    df_train_temp = object.transform(df_train_temp) 
-                    df_test_temp=object.transform(df_test_temp) 
-                    svma=svm.SVC()
-                    distributions=dict(C=np.logspace(-3, 2, 2*n_iter), gamma=np.logspace(-3, 2, 2*n_iter))
-                    clf = RandomizedSearchCV(svma, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
-                    clf.fit(df_train_temp, labels_train_loop[train_index])                
-                    predictions = clf.predict(df_test_temp)
-                    accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-            # Without feature selection check accuracy with Random forest  
-        for k in range(n_features):
-            sdf[str(k)]=np.std(accf[str(k)])
-        '''for k in range(n_features):
-            accf[str(k)]=sum(accf[str(k)])/len(accf[str(k)])'''
-        
 
+            
+
+
+            #Confusion matrix
+            '''predictions = clf_baseline.predict(X_test)
+            ax = skplt.metrics.plot_confusion_matrix(Y_test, predictions, normalize=True)
+            plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'confusion'+'.svg')
+            plt.clf()
+            #ROC curve
+            predicted_probas = clf_baseline.predict_proba(X_test)
+            ax2 = skplt.metrics.plot_roc(Y_test, predicted_probas)
+            plt.savefig(plot_dir+args.experiment_name+'_baseline_'+'roc'+'.svg')
+            plt.clf()'''
+            
+            
+
+            #plot_dataset(X=X_test,y=Y_test,fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_raw_test',args=args)
+            #plot_dataset(X=np.array(X_input_test),y=np.array(Y_input_test),fig_dir=plot_dir, fig_name=args.experiment_name+'_dataset_decoded_test',args=args)
+            np.savez_compressed(
+                'spike_data.npz',
+                X=np.array(X_input_test),
+                Y_Train=np.array(Y_input_test)
+            )
+
+
+        return svm_score_input_list,rf_score_input_list,avg_spike_rate_list, svm_score_baseline_list, svm_score_comb_list, rf_score_comb_list, acc_list, sel_list, gen_list, nfeat_list, rf_score_individual_input_list# auto_score
 
         
+if __name__ == '__main__':
+    logger = logging.getLogger(__name__)
 
-        return acc, sd, accf, sdf, best_params_ie
-      
-  
-        #sb="jc_mot"
-    
-def topn_feat(args):
-    if args.dataset=="bci3":
-        data=np.load('./data/bci_3.npz')
-        data_train=data["X"]
-        data_test=data["X_test"]
-        labels=data['events']
-        truelabels=np.loadtxt("./true_labels.txt", delimiter="/n")
-        data_train_ib_500=segment(data_train, segment_length=500)
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_500=segment(data_test, segment_length=500)
-        segment_length=500
-        labels_test_ib_500=np.repeat(truelabels,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1000=segment(data_test, segment_length=1000)
-        segment_length=1000
-        labels_test_ib_1000=np.repeat(truelabels,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels,3000/int(segment_length))
-
-        data_test_ib_1500=segment(data_test, segment_length=1500)
-        segment_length=1500
-        labels_test_ib_1500=np.repeat(truelabels,3000/int(segment_length))
-
-        data_train_ib_3000=data_train
-        segment_length=3000
-        labels_train_ib_3000=labels
-
-        data_test_ib_3000=data_test
-        segment_length=3000
-        labels_test_ib_3000=truelabels
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
-        label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
-        segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        n_iter=args.niter
-
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        data_test_loop=testing_data[str(args.tstep)]
-        labels_test_loop=label_data_test[str(args.tstep)]
-
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop, 1000, l_feat, True)
-        print(np.amax(df_train_temp.values))
-        print(np.amin(df_train_temp.values))
-        # Without feature selection check accuracy with Random forest
-        rf = RandomForestClassifier()
-        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
-        df_train, llim, nfeatures =createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        
-        return llim, nfeatures, data_train.shape[1]
-      
-    else:
-        data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
-        data_train_ib = data_ib["X"]
-        labels_train_ib = data_ib["y"]
-        l_feat=args.l_feat
-        #500 Tstep
-        data_train_ib_500=segment(data_train_ib, segment_length=500)
-        print(np.amax(data_train_ib_500))
-        print(np.amin(data_train_ib_500))
-
-        segment_length=500
-        labels_train_ib_500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1000 Tstep
-        data_train_ib_1000=segment(data_train_ib, segment_length=1000)
-        segment_length=1000
-        labels_train_ib_1000=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #1500 Tstep
-        data_train_ib_1500=segment(data_train_ib, segment_length=1500)
-        segment_length=1500
-        labels_train_ib_1500=np.repeat(labels_train_ib,3000/int(segment_length))
-
-        #3000 Tstep
-        data_train_ib_3000=data_train_ib
-        segment_length=3000
-        labels_train_ib_3000=labels_train_ib
-
-        training_data={'500':data_train_ib_500, '1000':data_train_ib_1000, '1500':data_train_ib_1500, '3000':data_train_ib_3000}
-        label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000, '1500':labels_train_ib_1500, '3000':labels_train_ib_3000}
-        segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        n_iter=args.niter
-
-
-        kf3 = StratifiedKFold(n_splits=5, shuffle=False)
-        #accd={}
-
-        #print("iteration "+str(i))
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-
-        #fs=int(segment_length[i]/3)
-
-        rf = RandomForestClassifier()
-        '''distributions=dict(n_estimators=np.logspace(0, 3, 400).astype(int))
-        clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)'''
-        df_train, llim, nfeatures=createFV_individual_feat(data_train_loop,  1000, l_feat, True)
-        
-        return llim, nfeatures, data_train_ib.shape[1]
-
-
-
-        
-
-    #final_df = pd.DataFrame({"N": accuracy.keys(), "Accuracy":accuracy.values()})
-
-    
-
+    args = my_args()
+    print(args.__dict__)
+    logging.basicConfig(level=logging.DEBUG)
+    # Fix the seed of all random number generator
+    seed = 500
+    random.seed(seed)
+    np.random.seed(seed)
+    svm_score_input,avg_spike_rate, svm_score_baseline= evaluate_encoder(args)
+    print('Average spike rate :')
+    print(avg_spike_rate)
+    print('Accuraccy input: ' + str(svm_score_input))
+    logger.info('All done.')
