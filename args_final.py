@@ -9,8 +9,8 @@ def args():
     parser.add_argument(
         "--method", default="individual", type=str, help="Feature selection method.(individual/baseline/genetic)"
     )
-    
-    # Defining the model
+
+    # Model Defining
     parser.add_argument(
         "--dataset", default="bci3", type=str, help="Dataset(BCI3)"
     )
