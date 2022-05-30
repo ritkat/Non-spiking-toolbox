@@ -158,6 +158,7 @@ def repeater(label_vovel, rep):
       label_vovel_f=temp
     else:
       label_vovel_f=np.append(label_vovel_f, temp)
+  #TWST
   return label_vovel_f
 
 
@@ -168,11 +169,6 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
   
   data_2_subs=data_train
-  '''data_2_subs=np.zeros((data_train.shape[0], data_train.shape[1], int(data_train.shape[2]/4)))
-  for i in range(0, data_train.shape[0]):
-      for j in range(0, data_train.shape[1]):
-          data_2_subs[i, j, :]=signal.resample(data_2_sub[i, j, :], int(data_train.shape[2]/4))'''
-
   #data_2_subs.shape
   
   if(c_ref==True):
