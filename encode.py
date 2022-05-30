@@ -26,7 +26,9 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import StratifiedKFold
 from utilis import *
 from createFV import *
+from preprocessed import *
 from args import args as my_args
+from preprocess_individual import *
 
 def encode(args):
     # general stuff

@@ -7,13 +7,14 @@ import os
 from utils import*
 from createFV import *
 from evaluate_encoder import*
-
+from preprocessed import *
 #from evaluate_reservoir import *
 #from utilis import *
 from args_final import args as my_args
 from itertools import product
 from itertools import product, islice
 import time
+from preprocess_individual import *
 
 if __name__ == '__main__':
 
