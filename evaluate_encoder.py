@@ -34,6 +34,8 @@ from sklearn.model_selection import StratifiedKFold
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier 
+from createFV import *
+
 # Import the RFE from sklearn library
 from sklearn.feature_selection import RFE,SelectFromModel
 from sklearn.model_selection import train_test_split
