@@ -52,7 +52,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         #car.shape
         for k in range(0, data_train.shape[1]):
             data_2_subs[j,k,:]=data_2_subs[j,k,:]-car
-            
+      # Hi Ritwik  
   #subsampling by 4 
   data_2_subs_t=data_test
   '''data_2_subs_t=np.zeros((data_test.shape[0], data_test.shape[1], int(data_test.shape[2]/4)))
