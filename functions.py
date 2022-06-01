@@ -33,7 +33,7 @@ from utils import *
 from preprocessed import *
 
 args=my_args()
-
+f_split=2
 # Fucntions of preprocessing 
 
 def preprocess(data_train, data_test,f_split, fs, c_ref):
