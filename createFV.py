@@ -31,7 +31,7 @@ from tqdm.notebook import tqdm
 from args_final import args as my_args
 from utils import *
 from preprocessed import *
-from preprocess_individual import *
+from functions import *
 
 args=my_args()
 
@@ -103,149 +103,169 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       for i in range(0, data_train.shape[1]):
         hu=pyeeg.hurst(data_trial[:,i])
         HUFV = np.append(HUFV, hu)'''
-      
       PFDFV = np.array([])    
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          pfd=pyeeg.pfd(data_trial_s[x][:,i])
-          PFDFV = np.append(PFDFV, pfd)
+      concat1(PFDFV, pyeeg.f, data_train, data_trial_s)
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=pyeeg.f(data_trial_s[x][:,i])
+      #     PFDFV = np.append(PFDFV, f)
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          dfa=pyeeg.dfa(data_trial_s[x][:,i])
-          DFAFV = np.append(DFAFV, dfa)
-        
+      concat1(DFAFV, pyeeg.f, data_train, data_trial_s)
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=pyeeg.f(data_trial_s[x][:,i])
+      #     DFAFV = np.append(DFAFV, f)
+
+
       MNFV = np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          mn=np.mean(data_trial_s[x][:,i])
-          MNFV = np.append(MNFV, mn)
-        
+      concat1(MNFV, np.mean, data_train, data_trial_s)  
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=np.mean(data_trial_s[x][:,i])
+      #     MNFV = np.append(MNFV, f)
+      
       STDFV = np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          sd=np.std(data_trial_s[x][:,i])
-          STDFV = np.append(STDFV, sd)
-        
+      concat1(STDFV, np.std, data_train, data_trial_s)  
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=np.std(data_trial_s[x][:,i])
+      #     STDFV = np.append(STDFV, f)
+
       MT1FV=np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_s[x][:,i])
-          MT1FV = np.append(MT1FV, f)
-          
+      concat1(MT1FV, mean1, data_train, data_trial_s)  
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean1(data_trial_s[x][:,i])
+      #     MT1FV = np.append(MT1FV, f)
+
       MT2FV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_s[x][:,i])
-          MT2FV = np.append(MT2FV, f)
-          
+      concat2(MT2FV, mean2, data_train, data_trial_s)      
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean2(data_trial_s[x][:,i])
+      #     MT2FV = np.append(MT2FV, f)
+
       LDFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_s[x][:,i])
-          LDFV = np.append(LDFV, f)
-          
+      concat1(LDFV, log_detec, data_train, data_trial_s)      
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = log_detec(data_trial_s[x][:,i])
+      #     LDFV = np.append(LDFV, f)
+
       MDNFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_s[x][:,i]))
-          MDNFV = np.append(MDNFV, f)
-          
+      concat1(MDNFV, np.median, data_train, data_trial_s)      
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = np.median(np.absolute(data_trial_s[x][:,i]))
+      #     MDNFV = np.append(MDNFV, f)
+      
       ABDFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_s[x][:,i])
-          ABDFV = np.append(ABDFV, f)
-          
+      concat1(ABDFV, abs_diff, data_train, data_trial_s)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = abs_diff(data_trial_s[x][:,i])
+      #     ABDFV = np.append(ABDFV, f)
+
       MFQFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_s[x][:,i])
-          MFQFV = np.append(MFQFV, f)
-          
+      concat1(MFQFV, mean_freq, data_train, data_trial_s)     
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean_freq(data_trial_s[x][:,i])
+      #     MFQFV = np.append(MFQFV, f)
+      
       FAMFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_s[x][:,i])
-          FAMFV = np.append(FAMFV, f)
-          
+      concat1(FAMFV, freq_atmax, data_train, data_trial_s)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = freq_atmax(data_trial_s[x][:,i])
+      #     FAMFV = np.append(FAMFV, f)
+
       MPSFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_s[x][:,i])
-          MPSFV = np.append(MPSFV, f)
-          
+      concat1(MPSFV, max_psd, data_train, data_trial_s)     
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = max_psd(data_trial_s[x][:,i])
+      #     MPSFV = np.append(MPSFV, f)
+
       MT1FVH=np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_s_h[x][:,i])
-          MT1FVH = np.append(MT1FVH, f)
-          
+      concat1(MT1FVH, mean1, data_train, data_trial_s_h)     
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean1(data_trial_s_h[x][:,i])
+      #     MT1FVH = np.append(MT1FVH, f)
+
       MT2FVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_s_h[x][:,i])
-          MT2FVH = np.append(MT2FVH, f)
-          
+      concat2(MT2FVH, mean2, data_train, data_trial_s_h)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean2(data_trial_s_h[x][:,i])
+      #     MT2FVH = np.append(MT2FVH, f)
+      
       LDFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_s_h[x][:,i])
-          LDFVH = np.append(LDFVH, f)
-          
+      concat1(LDFVH, log_detec, data_train, data_trial_s_h)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = log_detec(data_trial_s_h[x][:,i])
+      #     LDFVH = np.append(LDFVH, f)
+
       MDNFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_s_h[x][:,i]))
-          MDNFVH = np.append(MDNFVH, f)
-          
+      concat1(MDNFVH, np.median, data_train, data_trial_s_h)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = np.median(np.absolute(data_trial_s_h[x][:,i]))
+      #     MDNFVH = np.append(MDNFVH, f)
+      
       ABDFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_s_h[x][:,i])
-          ABDFVH = np.append(ABDFVH, f)
-          
+      concat1(ABDFVH, abs_diff, data_train, data_trial_s_h)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = abs_diff(data_trial_s_h[x][:,i])
+      #     ABDFVH = np.append(ABDFVH, f)
+      
       MFQFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_s_h[x][:,i])
-          MFQFVH = np.append(MFQFVH, f)
-          
+      concat1(MFQFVH, mean_freq, data_train, data_trial_s_h)     
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean_freq(data_trial_s_h[x][:,i])
+      #     MFQFVH = np.append(MFQFVH, f)
+      
       FAMFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_s_h[x][:,i])
-          FAMFVH = np.append(FAMFVH, f)
-          
+      concat1(FAMFVH, freq_atmax, data_train, data_trial_s_h)     
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = freq_atmax(data_trial_s_h[x][:,i])
+      #     FAMFVH = np.append(FAMFVH, f)
+
       MPSFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_s_h[x][:,i])
-          MPSFVH = np.append(MPSFVH, f)
+      concat1(MPSFVH, max_psd, data_train, data_trial_s_h)     
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = max_psd(data_trial_s_h[x][:,i])
+      #     MPSFVH = np.append(MPSFVH, f)
           
           
           
       '''CORFV = np.array([])
       for i in range(0, data_train.shape[1]):
         cor=nolds.corr_dim(data_trial[:,i],1)
-        CORFV = np.append(CORFV, sd)'''
+        CORFV = np.append(CORFV, f)'''
         
       '''HJFV = np.array([])
       for i in range(0, data_train.shape[1]):
@@ -464,142 +484,162 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         hu=pyeeg.hurst(data_trial[:,i])
         HUFV = np.append(HUFV, hu)'''
       
-      PFDFV = np.array([])    
-      for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(f_split):
-          pfd=pyeeg.pfd(data_trial_s[x][:,i])
-          PFDFV = np.append(PFDFV, pfd)
+      # PFDFV = np.array([])    
+      concat1(PFDFV, pyeeg.f, data_2_subs_t, data_trial_s)
+      # for i in range(0, data_2_subs_t.shape[1]):
+      #   for x in range(f_split):
+      #     f=pyeeg.f(data_trial_s[x][:,i])
+      #     PFDFV = np.append(PFDFV, f)
       #Concatenaton of All the feature vectors
       
-      DFAFV = np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(f_split):
-          dfa=pyeeg.dfa(data_trial_s[x][:,i])
-          DFAFV = np.append(DFAFV, dfa)
+      # DFAFV = np.array([])
+      concat1(DFAFV, pyeeg.f, data_2_subs_t, data_trial_s)
+      # for i in range(0, data_2_subs_t.shape[1]):
+      #   for x in range(f_split):
+      #     f=pyeeg.f(data_trial_s[x][:,i])
+      #     DFAFV = np.append(DFAFV, f)
         
+      concat1(MNFV, np.mean, data_2_subs_t, data_trial_s)  
+      # MNFV = np.array([])
+      # for i in range(0, data_2_subs_t.shape[1]):
+      #   for x in range(f_split):
+      #     f=np.mean(data_trial_s[x][:,i])
+      #     MNFV = np.append(MNFV, f)
+
+      concat1(STDFV, np.std, data_2_subs_t, data_trial_s)  
+      # STDFV = np.array([])
+      # for i in range(0, data_2_subs_t.shape[1]):
+      #   for x in range(f_split):
+      #     f=np.std(data_trial_s[x][:,i])
+      #     STDFV = np.append(STDFV, f)
         
-      MNFV = np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(f_split):
-          mn=np.mean(data_trial_s[x][:,i])
-          MNFV = np.append(MNFV, mn)
-        
-      STDFV = np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(f_split):
-          sd=np.std(data_trial_s[x][:,i])
-          STDFV = np.append(STDFV, sd)
-        
-      MT1FV=np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_s[x][:,i])
-          MT1FV = np.append(MT1FV, f)
-          
-      MT2FV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_s[x][:,i])
-          MT2FV = np.append(MT2FV, f)
-          
-      LDFV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_s[x][:,i])
-          LDFV = np.append(LDFV, f)
-          
-      MDNFV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_s[x][:,i]))
-          MDNFV = np.append(MDNFV, f)
-          
-      ABDFV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_s[x][:,i])
-          ABDFV = np.append(ABDFV, f)
-          
-      MFQFV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_s[x][:,i])
-          MFQFV = np.append(MFQFV, f)
-          
-      FAMFV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_s[x][:,i])
-          FAMFV = np.append(FAMFV, f)
-          
-      MPSFV=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_s[x][:,i])
-          MPSFV = np.append(MPSFV, f)
-                              
-      MT1FVH=np.array([])
-      for i in range(0, data_2_subs_t.shape[1]):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_s_h[x][:,i])
-          MT1FVH = np.append(MT1FVH, f)
-          
-      MT2FVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_s_h[x][:,i])
-          MT2FVH = np.append(MT2FVH, f)
-          
-      LDFVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_s_h[x][:,i])
-          LDFVH = np.append(LDFVH, f)
-          
-      MDNFVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_s_h[x][:,i]))
-          MDNFVH = np.append(MDNFVH, f)
-          
-      ABDFVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_s_h[x][:,i])
-          ABDFVH = np.append(ABDFVH, f)
-          
-      MFQFVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_s_h[x][:,i])
-          MFQFVH = np.append(MFQFVH, f)
-          
-      FAMFVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_s_h[x][:,i])
-          FAMFVH = np.append(FAMFVH, f)
-          
-      MPSFVH=np.array([])
-      for i in tqdm(range(0, data_2_subs_t.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_s_h[x][:,i])
-          MPSFVH = np.append(MPSFVH, f)
+      concat1(MT1FV, mean1, data_2_subs_t, data_trial_s)  
+      # MT1FV=np.array([])
+      # for i in range(0, data_2_subs_t.shape[1]):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean1(data_trial_s[x][:,i])
+      #     MT1FV = np.append(MT1FV, f)
+
+      concat1(MT2FV, mean2, data_2_subs_t, data_trial_s)    
+      # MT2FV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean2(data_trial_s[x][:,i])
+      #     MT2FV = np.append(MT2FV, f)
+
+      concat1(LDFV, log_detec, data_2_subs_t, data_trial_s)    
+      # LDFV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = log_detec(data_trial_s[x][:,i])
+      #     LDFV = np.append(LDFV, f)
+
+      concat1(MDNFV, np.median, data_2_subs_t, data_trial_s)
+
+      # MDNFV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = np.median(np.absolute(data_trial_s[x][:,i]))
+      #     MDNFV = np.append(MDNFV, f)
+
+      concat1(ABDFV, abs_diff, data_2_subs_t, data_trial_s)    
+      # ABDFV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = abs_diff(data_trial_s[x][:,i])
+      #     ABDFV = np.append(ABDFV, f)
+
+      concat1(MFQFV, mean_freq, data_2_subs_t, data_trial_s)    
+      # MFQFV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean_freq(data_trial_s[x][:,i])
+      #     MFQFV = np.append(MFQFV, f)
+
+      concat1(FAMFV, freq_atmax, data_2_subs_t, data_trial_s)    
+      # FAMFV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = freq_atmax(data_trial_s[x][:,i])
+      #     FAMFV = np.append(FAMFV, f)
+
+      concat1(MPSFV, max_psd, data_2_subs_t, data_trial_s)     
+      # MPSFV=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = max_psd(data_trial_s[x][:,i])
+      #     MPSFV = np.append(MPSFV, f)
+
+      concat1(MT1FVH, mean1, data_2_subs_t, data_trial_s)                        
+      # MT1FVH=np.array([])
+      # for i in range(0, data_2_subs_t.shape[1]):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean1(data_trial_s_h[x][:,i])
+      #     MT1FVH = np.append(MT1FVH, f)
+
+      concat2(MT2FVH, mean2, data_2_subs_t, data_trial_s_h)     
+      # MT2FVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean2(data_trial_s_h[x][:,i])
+      #     MT2FVH = np.append(MT2FVH, f)
+
+      concat1(LDFVH, log_detec, data_2_subs_t, data_trial_s_h)     
+      # LDFVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = log_detec(data_trial_s_h[x][:,i])
+      #     LDFVH = np.append(LDFVH, f)
+
+      concat1(MDNFVH, np.median, data_2_subs_t, data_trial_s_h)        
+      # MDNFVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = np.median(np.absolute(data_trial_s_h[x][:,i]))
+      #     MDNFVH = np.append(MDNFVH, f)
+
+      concat1(ABDFVH, abs_diff, data_2_subs_t, data_trial_s_h)    
+      # ABDFVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = abs_diff(data_trial_s_h[x][:,i])
+      #     ABDFVH = np.append(ABDFVH, f)
+
+      concat1(MFQFVH, mean_freq, data_2_subs_t, data_trial_s_h)      
+      # MFQFVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean_freq(data_trial_s_h[x][:,i])
+      #     MFQFVH = np.append(MFQFVH, f)
+      
+      concat1(FAMFVH, freq_atmax, data_2_subs_t, data_trial_s_h)     
+      # FAMFVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = freq_atmax(data_trial_s_h[x][:,i])
+      #     FAMFVH = np.append(FAMFVH, f)
+      
+      concat1(MPSFVH,max_psd, data_2_subs_t, data_trial_s_h)      
+      # MPSFVH=np.array([])
+      # for i in tqdm(range(0, data_2_subs_t.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = max_psd(data_trial_s_h[x][:,i])
+      #     MPSFVH = np.append(MPSFVH, f)
                               
          
         
@@ -976,149 +1016,168 @@ def createFV_individual_feat(data_train, f_split,fs, l_feat, c_ref):
       for i in range(0, data_train.shape[1]):
         hu=pyeeg.hurst(data_trial[:,i])
         HUFV = np.append(HUFV, hu)'''
-      
       PFDFV = np.array([])    
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          pfd=pyeeg.pfd(data_trial_s[x][:,i])
-          PFDFV = np.append(PFDFV, pfd)
+      concat1(PFDFV, pyeeg.f, data_train, data_trial_s)    
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=pyeeg.f(data_trial_s[x][:,i])
+      #     PFDFV = np.append(PFDFV, f)
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          dfa=pyeeg.dfa(data_trial_s[x][:,i])
-          DFAFV = np.append(DFAFV, dfa)
+      concat1(DFAFV, pyeeg.f, data_train, data_trial_s)    
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=pyeeg.f(data_trial_s[x][:,i])
+      #     DFAFV = np.append(DFAFV, f)
         
       MNFV = np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          mn=np.mean(data_trial_s[x][:,i])
-          MNFV = np.append(MNFV, mn)
+      concat1(MNFV, np.mean, data_train, data_trial_s)    
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=np.mean(data_trial_s[x][:,i])
+      #     MNFV = np.append(MNFV, f)
         
       STDFV = np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          sd=np.std(data_trial_s[x][:,i])
-          STDFV = np.append(STDFV, sd)
+      concat1(STDFV, np.std, data_train, data_trial_s)    
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     f=np.std(data_trial_s[x][:,i])
+      #     STDFV = np.append(STDFV, f)
         
       MT1FV=np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_s[x][:,i])
-          MT1FV = np.append(MT1FV, f)
+      concat1(MT1FV, mean1, data_train, data_trial_s)    
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean1(data_trial_s[x][:,i])
+      #     MT1FV = np.append(MT1FV, f)
           
       MT2FV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_s[x][:,i])
-          MT2FV = np.append(MT2FV, f)
+      concat1(MT2FV, mean2, data_train, data_trial_s)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean2(data_trial_s[x][:,i])
+      #     MT2FV = np.append(MT2FV, f)
           
       LDFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_s[x][:,i])
-          LDFV = np.append(LDFV, f)
+      concat1(LDFV, log_detec, data_train, data_trial_s)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = log_detec(data_trial_s[x][:,i])
+      #     LDFV = np.append(LDFV, f)
           
       MDNFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_s[x][:,i]))
-          MDNFV = np.append(MDNFV, f)
+      concat1(MDNFV, np.median, data_train, data_trial_s)    
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = np.median(np.absolute(data_trial_s[x][:,i]))
+      #     MDNFV = np.append(MDNFV, f)
           
       ABDFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_s[x][:,i])
-          ABDFV = np.append(ABDFV, f)
+      concat1(ABDFV, abs_diff, data_train, data_trial_s)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = abs_diff(data_trial_s[x][:,i])
+      #     ABDFV = np.append(ABDFV, f)
           
       MFQFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_s[x][:,i])
-          MFQFV = np.append(MFQFV, f)
+      concat1(MFQFV, mean_freq, data_train, data_trial_s)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean_freq(data_trial_s[x][:,i])
+      #     MFQFV = np.append(MFQFV, f)
           
       FAMFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_s[x][:,i])
-          FAMFV = np.append(FAMFV, f)
+      concat1(FAMFV, freq_atmax, data_train, data_trial_s)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = freq_atmax(data_trial_s[x][:,i])
+      #     FAMFV = np.append(FAMFV, f)
           
       MPSFV=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_s[x][:,i])
-          MPSFV = np.append(MPSFV, f)
+      concat1(MPSFV, max_psd, data_train, data_trial_s)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = max_psd(data_trial_s[x][:,i])
+      #     MPSFV = np.append(MPSFV, f)
           
       MT1FVH=np.array([])
-      for i in range(0, data_train.shape[1]):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean1(data_trial_s_h[x][:,i])
-          MT1FVH = np.append(MT1FVH, f)
+      concat1(MT1FVH, mean1, data_train, data_trial_s_h)
+      # for i in range(0, data_train.shape[1]):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean1(data_trial_s_h[x][:,i])
+      #     MT1FVH = np.append(MT1FVH, f)
           
       MT2FVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean2(data_trial_s_h[x][:,i])
-          MT2FVH = np.append(MT2FVH, f)
+      concat2(MT2FVH, mean2, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean2(data_trial_s_h[x][:,i])
+      #     MT2FVH = np.append(MT2FVH, f)
           
       LDFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = log_detec(data_trial_s_h[x][:,i])
-          LDFVH = np.append(LDFVH, f)
+      concat1(LDFVH, log_detec, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = log_detec(data_trial_s_h[x][:,i])
+      #     LDFVH = np.append(LDFVH, f)
           
       MDNFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = np.median(np.absolute(data_trial_s_h[x][:,i]))
-          MDNFVH = np.append(MDNFVH, f)
+      concat1(MDNFVH, np.median, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = np.median(np.absolute(data_trial_s_h[x][:,i]))
+      #     MDNFVH = np.append(MDNFVH, f)
           
       ABDFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = abs_diff(data_trial_s_h[x][:,i])
-          ABDFVH = np.append(ABDFVH, f)
+      concat1(ABDFVH, abs_diff, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = abs_diff(data_trial_s_h[x][:,i])
+      #     ABDFVH = np.append(ABDFVH, f)
           
       MFQFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = mean_freq(data_trial_s_h[x][:,i])
-          MFQFVH = np.append(MFQFVH, f)
+      concat1(MFQFVH, mean_freq, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = mean_freq(data_trial_s_h[x][:,i])
+      #     MFQFVH = np.append(MFQFVH, f)
           
       FAMFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = freq_atmax(data_trial_s_h[x][:,i])
-          FAMFVH = np.append(FAMFVH, f)
+      concat1(FAMFVH, freq_atmax, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = freq_atmax(data_trial_s_h[x][:,i])
+      #     FAMFVH = np.append(FAMFVH, f)
           
       MPSFVH=np.array([])
-      for i in tqdm(range(0, data_train.shape[1])):
-        for x in range(f_split):
-          #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
-          f = max_psd(data_trial_s_h[x][:,i])
-          MPSFVH = np.append(MPSFVH, f)
+      concat1(MPSFVH, max_psd, data_train, data_trial_s_h)
+      # for i in tqdm(range(0, data_train.shape[1])):
+      #   for x in range(f_split):
+      #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
+      #     f = max_psd(data_trial_s_h[x][:,i])
+      #     MPSFVH = np.append(MPSFVH, f)
           
           
           
       '''CORFV = np.array([])
       for i in range(0, data_train.shape[1]):
         cor=nolds.corr_dim(data_trial[:,i],1)
-        CORFV = np.append(CORFV, sd)'''
+        CORFV = np.append(CORFV, f)'''
         
       '''HJFV = np.array([])
       for i in range(0, data_train.shape[1]):

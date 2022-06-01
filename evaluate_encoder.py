@@ -49,7 +49,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RandomizedSearchCV
 from args_final import args as my_args
-from preprocess_individual import *
+from functions import *
 
 args=my_args()
 

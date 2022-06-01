@@ -28,7 +28,8 @@ from utilis import *
 from createFV import *
 from preprocessed import *
 from args import args as my_args
-from preprocess_individual import *
+
+from functions import *
 
 def encode(args):
     # general stuff
