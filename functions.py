@@ -190,6 +190,7 @@ def concat1(feat, fn, data_in, data_sub):
             #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
             f = fn(data_sub[x][:,i])
             feat = np.append(feat, f)
+    
 
 def concat2(feat, fn, data_in, data_sub):
     feat=np.array([])
