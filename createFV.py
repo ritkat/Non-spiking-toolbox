@@ -142,11 +142,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       #     MT1FV = np.append(MT1FV, f)
 
       MT2FV=np.array([])
-<<<<<<< HEAD
-      concat1(MT2FV, mean2, data_train, data_trial_s)      
-=======
       MT2FV=concat1(MT2FV, mean2, data_train, data_trial_s, f_split)           
->>>>>>> fc88ecbd7eff93208bcdab42f49e97c88cc0df3a
       # for i in tqdm(range(0, data_train.shape[1])):
       #   for x in range(f_split):
       #     #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
