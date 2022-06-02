@@ -104,7 +104,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         hu=pyeeg.hurst(data_trial[:,i])
         HUFV = np.append(HUFV, hu)'''
       PFDFV = np.array([])    
-      PFDFV=concat1(PFDFV, pyeeg.f, data_train, data_trial_s, f_split)
+      PFDFV=concat1(PFDFV, pyeeg.pfd, data_train, data_trial_s, f_split)
       # for i in range(0, data_train.shape[1]):
       #   for x in range(f_split):
       #     f=pyeeg.f(data_trial_s[x][:,i])
@@ -112,7 +112,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
-      DFAFV=concat1(DFAFV, pyeeg.f, data_train, data_trial_s, f_split)
+      DFAFV=concat1(DFAFV, pyeeg.dfa, data_train, data_trial_s, f_split)
       # for i in range(0, data_train.shape[1]):
       #   for x in range(f_split):
       #     f=pyeeg.f(data_trial_s[x][:,i])
@@ -485,7 +485,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
         HUFV = np.append(HUFV, hu)'''
       
       # PFDFV = np.array([])    
-      PFDFV =concat1(PFDFV, pyeeg.f, data_2_subs_t, data_trial_s, f_split)
+      PFDFV =concat1(PFDFV, pyeeg.pfd, data_2_subs_t, data_trial_s, f_split)
       # for i in range(0, data_2_subs_t.shape[1]):
       #   for x in range(f_split):
       #     f=pyeeg.f(data_trial_s[x][:,i])
@@ -493,7 +493,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
       #Concatenaton of All the feature vectors
       
       # DFAFV = np.array([])
-      DFAFV = concat1(DFAFV, pyeeg.f, data_2_subs_t, data_trial_s, f_split)
+      DFAFV = concat1(DFAFV, pyeeg.dfa, data_2_subs_t, data_trial_s, f_split)
       # for i in range(0, data_2_subs_t.shape[1]):
       #   for x in range(f_split):
       #     f=pyeeg.f(data_trial_s[x][:,i])
@@ -1017,7 +1017,7 @@ def createFV_individual_feat(data_train, f_split,fs, l_feat, c_ref):
         hu=pyeeg.hurst(data_trial[:,i])
         HUFV = np.append(HUFV, hu)'''
       PFDFV = np.array([])    
-      PFDFV = concat1(PFDFV, pyeeg.f, data_train, data_trial_s, f_split)    
+      PFDFV = concat1(PFDFV, pyeeg.pfd, data_train, data_trial_s, f_split)    
       # for i in range(0, data_train.shape[1]):
       #   for x in range(f_split):
       #     f=pyeeg.f(data_trial_s[x][:,i])
@@ -1025,7 +1025,7 @@ def createFV_individual_feat(data_train, f_split,fs, l_feat, c_ref):
       #Concatenaton of All the feature vectors
       
       DFAFV = np.array([])
-      DFAFV = concat1(DFAFV, pyeeg.f, data_train, data_trial_s, f_split)    
+      DFAFV = concat1(DFAFV, pyeeg.dfa, data_train, data_trial_s, f_split)    
       # for i in range(0, data_train.shape[1]):
       #   for x in range(f_split):
       #     f=pyeeg.f(data_trial_s[x][:,i])
