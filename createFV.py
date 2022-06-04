@@ -98,6 +98,7 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
           for x in range(f_split):
             f, Pxx_den = signal.welch(data_trial_s[x][:,i], fs)
             SPFV=np.append(SPFV, (Pxx_den[np.where(f<100.0)[0].tolist()]))
+      
       PFDFV = np.array([]) 
       DFAFV = np.array([])
       MNFV = np.array([])
@@ -124,12 +125,12 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
       train__trial_s_h = [[MT1FVH, mean1], [MT2FVH, mean2],  [LDFVH, log_detec], [MDNFVH, np.median], [ABDFVH, abs_diff], [MFQFVH, mean_freq], [FAMFVH, freq_atmax], [MPSFVH, max_psd]]
 
-      for i in len(train__trial_s):
+      for i in range(len(train__trial_s)):
         train__trial_s[i][1] = np.array([])
         concat(train__trial_s[i][1],train__trial_s[i][1], data_train, data_trial_s, f_split)
 
 
-      for i in len(train__trial_s_h):
+      for i in range(len(train__trial_s_h)):
         train__trial_s_h[i][1] = np.array([])
         concat(train__trial_s[i][1],train__trial_s[i][1], data_train, data_trial_s_h, f_split)
 
