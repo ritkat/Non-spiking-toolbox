@@ -1559,7 +1559,7 @@ def topn_elec(args):
         return acc, best_params, sd
       
 def individual(args):
-    if(args.dataset=="bci3"):
+    if(args.dataset[0]=="bci3"):
         data=np.load('./data/bci_3.npz')
         data_train=data["X"]
         data_test=data["X_test"]
@@ -1604,14 +1604,14 @@ def individual(args):
         testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
         label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
         segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat 
-        n_iter=args.niter
-        f_split=args.f_split
+        l_feat=args.l_feat[0]
+        n_iter=args.niter[0]
+        f_split=args.f_split[0]
 
-        data_train_loop=training_data[str(int(args.tstep))]
-        labels_train_loop=label_data[str(int(args.tstep))]
-        data_test_loop=testing_data[str(int(args.tstep))]
-        labels_test_loop=label_data_test[str(int(args.tstep))]
+        data_train_loop=training_data[str(int(args.tstep[0]))]
+        labels_train_loop=label_data[str(int(args.tstep[0]))]
+        data_test_loop=testing_data[str(int(args.tstep[0]))]
+        labels_test_loop=label_data_test[str(int(args.tstep[0]))]
 
         acc={}
         best_params_ie={}
@@ -1624,7 +1624,7 @@ def individual(args):
                 df_train_temp, df_test_temp=createFV_individual(data_train_loop[:,np.newaxis,i,:], data_test_loop[:,np.newaxis,i,:],f_split, 1000, l_feat, False)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
+                if(args.classifier[0]=="RF"):
                     rf = RandomForestClassifier()
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
@@ -1632,7 +1632,7 @@ def individual(args):
                     best_params_ie[str(i)].append(clf.best_params_)
                     predictions = clf.predict(df_test_temp.values)
                     acc[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-                elif(args.classifier=="SVM"):
+                elif(args.classifier[0]=="SVM"):
                     object=StandardScaler()
                     object.fit(df_train_temp)
                     df_train_temp = object.transform(df_train_temp) 
@@ -1649,7 +1649,7 @@ def individual(args):
             acc[str(k)]=sum(acc[str(k)])/len(acc[str(k)]) 
 
 
-        n_features=args.nfeatures
+        n_features=args.nfeatures[0]
         accf={}
         for k in range(n_features):
             accf[str(k)]=[]  
@@ -1658,14 +1658,14 @@ def individual(args):
             df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, [i], True)
             print(np.amax(df_train_temp.values))
             print(np.amin(df_train_temp.values))
-            if(args.classifier=="RF"):
+            if(args.classifier[0]=="RF"):
                 rf = RandomForestClassifier()
                 distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                 clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                 clf.fit(df_train_temp.values, labels_train_loop)
                 predictions = clf.predict(df_test_temp.values)
                 accf[str(i)].append(metrics.accuracy_score(labels_test_loop,predictions))
-            elif(args.classifier=="SVM"):
+            elif(args.classifier[0]=="SVM"):
                 object=StandardScaler()
                 object.fit(df_train_temp)
                 df_train_temp = object.transform(df_train_temp) 
@@ -1688,7 +1688,7 @@ def individual(args):
 
 
     else:
-        data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
+        data_ib=np.load('./data/'+args.dataset[0]+'_epochs.npz')
         data_train_ib = data_ib["X"]
         labels_train_ib = data_ib["y"]
         #500 Tstep
@@ -1723,15 +1723,15 @@ def individual(args):
         #accd={}
 
         #print("iteration "+str(i))
-        data_train_loop=training_data[str(int(args.tstep))]
-        labels_train_loop=label_data[str(int(args.tstep))]
+        data_train_loop=training_data[str(int(args.tstep[0]))]
+        labels_train_loop=label_data[str(int(args.tstep[0]))]
         #fs=int(segment_length[i]/3)
         acc={}
         sd={}
         best_params_ie={}
-        l_feat=args.l_feat
-        n_iter=args.niter
-        f_split=args.f_split
+        l_feat=args.l_feat[0]
+        n_iter=args.niter[0]
+        f_split=args.f_split[0]
         #n_generations=40
         for k in range(data_train_loop.shape[1]):
             acc[str(k)]=[]
@@ -1745,7 +1745,7 @@ def individual(args):
                 df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index,np.newaxis,i,:], data_train_loop[test_index,np.newaxis,i,:],f_split,1000, l_feat, False)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
+                if(args.classifier[0]=="RF"):
                     rf = RandomForestClassifier()
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
@@ -1753,7 +1753,7 @@ def individual(args):
                     best_params_ie[str(i)].append(clf.best_params_)
                     predictions = clf.predict(df_test_temp.values)
                     acc[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
+                elif(args.classifier[0]=="SVM"):
                     object=StandardScaler()
                     object.fit(df_train_temp)
                     df_train_temp = object.transform(df_train_temp) 
@@ -1773,7 +1773,7 @@ def individual(args):
             
 
 
-        n_features=args.nfeatures
+        n_features=args.nfeatures[0]
         accf={}
         
         sdf={}
@@ -1786,14 +1786,14 @@ def individual(args):
                 df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split,1000, [i], True)
                 print(np.amax(df_train_temp.values))
                 print(np.amin(df_train_temp.values))
-                if(args.classifier=="RF"):
+                if(args.classifier[0]=="RF"):
                     rf = RandomForestClassifier()
                     distributions=dict(n_estimators=np.logspace(0, 3, 2*n_iter).astype(int))
                     clf = RandomizedSearchCV(rf, distributions, random_state=0, n_iter=n_iter,n_jobs=-1)
                     clf.fit(df_train_temp.values, labels_train_loop[train_index])                
                     predictions = clf.predict(df_test_temp.values)
                     accf[str(i)].append(metrics.accuracy_score(labels_train_loop[test_index],predictions))
-                elif(args.classifier=="SVM"):
+                elif(args.classifier[0]=="SVM"):
                     object=StandardScaler()
                     object.fit(df_train_temp)
                     df_train_temp = object.transform(df_train_temp) 
