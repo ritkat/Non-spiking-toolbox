@@ -125,23 +125,12 @@ def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
       train__trial_s_h = [[MT1FVH, mean1], [MT2FVH, mean2],  [LDFVH, log_detec], [MDNFVH, np.median], [ABDFVH, abs_diff], [MFQFVH, mean_freq], [FAMFVH, freq_atmax], [MPSFVH, max_psd]]
 
-<<<<<<< HEAD
       for i in len(train__trial_s):
         train__trial_s[i][0]=concat(train__trial_s[i][0],train__trial_s[i][1], data_train, data_trial_s, f_split)
 
 
       for i in len(train__trial_s_h):
         train__trial_s_h[i][0]=concat(train__trial_s_h[i][0],train__trial_s_h[i][1], data_train, data_trial_s_h, f_split)
-=======
-      for i in range(len(train__trial_s)):
-        train__trial_s[i][1] = np.array([])
-        concat(train__trial_s[i][1],train__trial_s[i][1], data_train, data_trial_s, f_split)
-
-
-      for i in range(len(train__trial_s_h)):
-        train__trial_s_h[i][1] = np.array([])
-        concat(train__trial_s[i][1],train__trial_s[i][1], data_train, data_trial_s_h, f_split)
->>>>>>> cdaa0b44070abcc8c2c017d9aa6f65da1ab32bce
 
       '''HUFV = np.array([])    
       for i in range(0, data_train.shape[1]):
