@@ -1608,10 +1608,10 @@ def individual(args):
         n_iter=args.niter
         f_split=args.f_split
 
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
-        data_test_loop=testing_data[str(args.tstep)]
-        labels_test_loop=label_data_test[str(args.tstep)]
+        data_train_loop=training_data[str(int(args.tstep))]
+        labels_train_loop=label_data[str(int(args.tstep))]
+        data_test_loop=testing_data[str(int(args.tstep))]
+        labels_test_loop=label_data_test[str(int(args.tstep))]
 
         acc={}
         best_params_ie={}
@@ -1723,8 +1723,8 @@ def individual(args):
         #accd={}
 
         #print("iteration "+str(i))
-        data_train_loop=training_data[str(args.tstep)]
-        labels_train_loop=label_data[str(args.tstep)]
+        data_train_loop=training_data[str(int(args.tstep))]
+        labels_train_loop=label_data[str(int(args.tstep))]
         #fs=int(segment_length[i]/3)
         acc={}
         sd={}
