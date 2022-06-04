@@ -1559,7 +1559,7 @@ def topn_elec(args):
         return acc, best_params, sd
       
 def individual(args):
-    if(args.dataset[0]=="bci3"):
+    if(args.dataset=="bci3"):
         data=np.load('./data/bci_3.npz')
         data_train=data["X"]
         data_test=data["X_test"]
@@ -1604,7 +1604,7 @@ def individual(args):
         testing_data={'500':data_test_ib_500, '1000':data_test_ib_1000, '1500':data_test_ib_1500, '3000':data_test_ib_3000}
         label_data_test={'500':labels_test_ib_500, '1000':labels_test_ib_1000, '1500':labels_test_ib_1500, '3000':labels_test_ib_3000}
         segment_length=[500,1000,1500,3000]
-        l_feat=args.l_feat[0]
+        l_feat=args.l_feat
         n_iter=args.niter[0]
         f_split=args.f_split[0]
 
@@ -1688,7 +1688,7 @@ def individual(args):
 
 
     else:
-        data_ib=np.load('./data/'+args.dataset[0]+'_epochs.npz')
+        data_ib=np.load('./data/'+args.dataset+'_epochs.npz')
         data_train_ib = data_ib["X"]
         labels_train_ib = data_ib["y"]
         #500 Tstep
@@ -1729,7 +1729,7 @@ def individual(args):
         acc={}
         sd={}
         best_params_ie={}
-        l_feat=args.l_feat[0]
+        l_feat=args.l_feat
         n_iter=args.niter[0]
         f_split=args.f_split[0]
         #n_generations=40
