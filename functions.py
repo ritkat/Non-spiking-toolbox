@@ -184,7 +184,7 @@ def preprocess_individual(data_train, f_split, fs, c_ref):
 # Concatenation funtions 
 
 def concat(feat, fn, data_in, data_sub,f_split):
-    feat=np.array([])
+    # feat=np.array([])
     for i in tqdm(range(0, data_in.shape[1])):
         for x in range(f_split):
             #(cA, cD) = pywt.dwt(data_trial[:,i], 'haar')
