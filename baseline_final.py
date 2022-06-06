@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import os
 from utils import*
 from createFV import *
+from functions import *
 from evaluate_encoder import*
 from preprocessed import *
 #from evaluate_reservoir import *
@@ -65,7 +66,7 @@ if __name__ == '__main__':
     elif(args.method=="individual"):
         df = pd.DataFrame({"dataset":[],"f_split":[],"l_feat":[],"tstep":[], "accuracy ind electrodes":[],"sd ind electrodes":[],"accuracy ind features":[],"sd ind features":[],"classifier":[], "best_params":[]})
 
-        datasets=["bci3","jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"]
+        datasets=["bci3"]
         for i in range(len(datasets)):
             args.tstep=np.random.choice(["500","3000"]),
             args.classifier=np.random.choice(["SVM","RF"]),

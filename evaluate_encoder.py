@@ -35,6 +35,7 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier 
 from createFV import *
+from functions import *
 from preprocessed import *
 
 # Import the RFE from sklearn library

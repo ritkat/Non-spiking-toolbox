@@ -179,7 +179,7 @@ def preprocess_individual(data_train, f_split, fs, c_ref):
       data_hilbert[j,i,:]=np.imag(hilbert(data_hilbert[j,i,:]))
   
   
-  return  data_2_subs, data_hilbert,
+  return  data_2_subs, data_hilbert
 
 # Concatenation funtions 
 
