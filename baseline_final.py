@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     args = my_args()
     #Run baseline mode for all features and all electrodes
-    args.method="individual"
+    args.method="baseline"
     if(args.method=="genetic"):
         print(args.__dict__)
         # Fix the seed of all random number generator
@@ -168,18 +168,14 @@ if __name__ == '__main__':
     elif(args.method=="baseline"):
         df = pd.DataFrame({"dataset":[],"l_feat":[],"tstep":[],"accuracy":[],"std":[],"f_split":[],"classifier":[],"best_params":[]})
 
-        parameters = dict(dataset=["bci3"],
-        tstep=[3000],classifier=["RF","SVM"],f_split=[2,3],l_feat=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]]
-        )
-
-        n_generations=10
-        #l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
-        #args.gen=n_generations
-        #args.l_feat=l_feat
-        args.niter=2
-
-        param_values = [v for v in parameters.values()]
-        for args.dataset,args.tstep,args.classifier,args.f_split,args.l_feat in product(*param_values):
+        datasets=["bci3","jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"]
+        for i in range(len(datasets)):
+            args.tstep=np.random.choice(["3000"])
+            args.classifier=np.random.choice(["SVM","RF"])
+            args.f_split=np.random.choice([1,2,3])
+            args.l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
+            args.niter=np.random.choice([200])
+            args.gen=np.random.choice([10])
             accd,sd,best_params=baseline(args)
             #for n in range(args.gen+1):
             df = df.append({"dataset":args.dataset,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":accd, "std":sd,"f_split":args.f_split,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
