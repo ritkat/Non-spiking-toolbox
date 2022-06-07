@@ -25,6 +25,7 @@ if __name__ == '__main__':
     if(args.method=="genetic"):
         print(args.__dict__)
         # Fix the seed of all random number generator
+        seed = int(args.seed)
         seed = 50
         random.seed(seed)
         np.random.seed(seed)
@@ -170,6 +171,7 @@ if __name__ == '__main__':
 
         datasets=["bci3","jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"]
         for i in range(len(datasets)):
+            print("ITERATION CHANGE")
             args.tstep=np.random.choice(["3000"])
             args.classifier=np.random.choice(["SVM","RF"])
             args.f_split=np.random.choice([1,2,3])
@@ -179,7 +181,7 @@ if __name__ == '__main__':
             accd,sd,best_params=baseline(args)
             #for n in range(args.gen+1):
             df = df.append({"dataset":args.dataset,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":accd, "std":sd,"f_split":args.f_split,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
-            log_file_name = 'accuracy_log_'+str(args.dataset)+'.csv'
+            log_file_name = 'accuracy_log_'+str(int(args.seed))+'.csv'
             pwd = os.getcwd()
             log_dir = pwd+'/log_dir/'
             df.to_csv(log_dir+log_file_name, index=False)

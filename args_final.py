@@ -42,6 +42,12 @@ def args():
     parser.add_argument(
         "--gen", default=20, type=int, help="Dataset(BCI3)"
     )
+    parser.add_argument(
+        "--seed",
+        default=50,
+        type=float,
+        help="Seed for random number generation",
+    )
     
 
 

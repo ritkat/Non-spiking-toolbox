@@ -12,7 +12,7 @@ cd $SLURM_TMPDIR/Non-spiking-toolbox
 echo "Starting application"
 mkdir -p "$HOME/ecog_results_features/"
 
-if $HOME/env/bin/python baseline_final.py --run $SLURM_ARRAY_TASK_ID ; then
+if $HOME/env/bin/python baseline_final.py --seed $SLURM_ARRAY_TASK_ID ; then
     echo "Copying results"
     mv "accuracy_log_$SLURM_ARRAY_TASK_ID.csv" "$HOME/ecog_results_features/"
 fi
