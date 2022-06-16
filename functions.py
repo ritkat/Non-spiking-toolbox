@@ -29,6 +29,7 @@ from pywt import wavedec
 from tqdm import tqdm
 from tqdm.notebook import tqdm
 from args_final import args as my_args
+
 from utils import *
 from preprocessed import *
 
@@ -71,16 +72,23 @@ def preprocess(data_train, data_test,f_split, fs, c_ref):
 
   #Standard Scaler
 
-  '''for j in range(0, data_train.shape[0]):
+  for j in range(0, data_2_subs.shape[0]):
       kr=data_2_subs[j,:,:]
       kr=data_2_subs[j,:,:]
       
       scaler=StandardScaler().fit(kr.T)
-      data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+      data_2_subs[j,:,:]=scaler.transform(kr.T).T
+
+  for j in range(0, data_2_subs_t.shape[0]):
+      kr=data_2_subs_t[j,:,:]
+      kr=data_2_subs_t[j,:,:]
+      
+      scaler=StandardScaler().fit(kr.T)
+      data_2_subs_t[j,:,:]=scaler.transform(kr.T).T
       
   #scaler = StandardScaler()
   #param_ls=[]
-  mu_l={}
+  '''mu_l={}
   std_l={}
   for j in range(data_2_subs.shape[1]):
     mu_l[str(j)]=[]
@@ -103,7 +111,7 @@ def preprocess(data_train, data_test,f_split, fs, c_ref):
       
   for i in range(data_2_subs_t.shape[0]):
     for j in range(data_2_subs_t.shape[1]):
-      data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]
+      data_2_subs_t[i,j,:]=(data_2_subs_t[i,j,:]-mu_l[str(j)])/std_l[str(j)]'''
       
   data_hilbert=copy.deepcopy(data_2_subs)
   data_hilbert_t=copy.deepcopy(data_2_subs_t)
@@ -140,16 +148,16 @@ def preprocess_individual(data_train, f_split, fs, c_ref):
 
   #Standard Scaler
 
-  '''for j in range(0, data_train.shape[0]):
+  for j in range(0, data_train.shape[0]):
       kr=data_2_subs[j,:,:]
       kr=data_2_subs[j,:,:]
       
       scaler=StandardScaler().fit(kr.T)
-      data_2_subs[j,:,:]=scaler.transform(kr.T).T'''
+      data_2_subs[j,:,:]=scaler.transform(kr.T).T
       
   #scaler = StandardScaler()
   #param_ls=[]
-  mu_l={}
+  '''mu_l={}
   std_l={}
   for j in range(data_2_subs.shape[1]):
     mu_l[str(j)]=[]
@@ -168,7 +176,7 @@ def preprocess_individual(data_train, f_split, fs, c_ref):
     
   for i in range(data_2_subs.shape[0]):
     for j in range(data_2_subs.shape[1]):
-      data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]
+      data_2_subs[i,j,:]=(data_2_subs[i,j,:]-mu_l[str(j)])/std_l[str(j)]'''
       
  
  
