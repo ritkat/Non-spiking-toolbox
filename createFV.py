@@ -37,6 +37,9 @@ args=my_args()
 
 def createFV_individual(data_train, data_test,f_split, fs, l_feat, c_ref):
 
+  if type(l_feat)==np.int64:
+    l_feat=[l_feat]
+
   data_2_subs, data_2_subs_t, data_hilbert, data_hilbert_t = preprocess(data_train, data_test,f_split, fs, c_ref)
 
   # #Extracting all the features and concatenating them 

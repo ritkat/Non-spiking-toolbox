@@ -169,24 +169,29 @@ if __name__ == '__main__':
     elif(args.method=="baseline"):
         df = pd.DataFrame({"dataset":[],"l_feat":[],"tstep":[],"accuracy":[],"std":[],"f_split":[],"classifier":[],"best_params":[]})
 
-        datasets=["bci3","jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"]
+        #datasets=["bci3","jc_mot","fp_im", "jc_im", "jm_im", "rr_im", "rh_im", "bp_im","wc_mot","zt_mot","fp_mot","gc_mot","hh_mot","hl_mot","jf_mot","jp_mot","rh_mot","rr_mot","ug_mot","jt_mot","jm_mot","gf_mot","bp_mot","cc_mot","ca_mot","de_mot"]
+        datasets=["bci3"]
         for i in range(len(datasets)):
             print("ITERATION CHANGE")
+            args.dataset=datasets[i]
             args.tstep=np.random.choice(["3000"])
             args.classifier=np.random.choice(["SVM","RF"])
-            args.f_split=np.random.choice([1,2,3])
-            args.l_feat=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
+            args.f_split=np.random.choice([1])
+            args.l_feat=np.random.choice([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35])
             args.niter=np.random.choice([200])
             args.gen=np.random.choice([10])
             accd,sd,best_params=baseline(args)
             #for n in range(args.gen+1):
             df = df.append({"dataset":args.dataset,"l_feat":args.l_feat,"tstep":args.tstep,"accuracy":accd, "std":sd,"f_split":args.f_split,"classifier":args.classifier, "best_params":best_params},ignore_index=True)
+            print(df)
             log_file_name = 'accuracy_log_'+str(int(args.seed))+'.csv'
-            pwd = os.getcwd()
-            log_dir = pwd+'/log_dir/'
-            df.to_csv(log_dir+log_file_name, index=False)
+            #pwd = os.getcwd()
+            #log_dir = pwd+'/log_dir/'
+            #df.to_csv(log_dir+log_file_name, index=False)
 
             df.to_csv(log_file_name, index=False)
+            print("file saved")
+            print(log_file_name)
 
             '''accuracy_df = pd.DataFrame({"Tstep": [500,1000,1500,3000], "Accuracy":[accd['0'], accd['1'], accd['2'], accd['3']]})
             # plot the feature importances in bars.
