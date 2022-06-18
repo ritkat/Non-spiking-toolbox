@@ -9,7 +9,7 @@ import EEGExtract as eeg
 import pywt
 from scipy.signal import hilbert, chirp
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratiifiedKFold
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier 
 # Import the RFE from sklearn library
@@ -198,7 +198,7 @@ def genetic(args):
     label_data={'500':labels_train_ib_500, '1000':labels_train_ib_1000}
     segment_length=[500,1000]
 
-    kf3 = KFold(n_splits=5, shuffle=False)
+    kf3 = StratifiedKFold(n_splits=5, shuffle=False)
 
     #print("iteration "+str(i))
     data_train_loop=training_data[str(args.tstep)]
@@ -216,7 +216,7 @@ def genetic(args):
       genstd[str(k)]=[]  
     f_split=args.f_split
     for train_index, test_index in kf3.split(data_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,3052, l_feat, True)
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index], f_split,1000, l_feat, True)
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
@@ -301,7 +301,7 @@ def genetic(args):
     segment_length=[500,1000,1500,3000]
 
 
-    kf3 = KFold(n_splits=5, shuffle=False)
+    kf3 = StratifiedKFold(n_splits=5, shuffle=False)
     #accd={}
 
     #print("iteration "+str(i))
@@ -497,7 +497,7 @@ def baseline(args):
     n_iter=args.niter
     f_split=args.f_split
     for train_index, test_index in kf3.split(data_train_loop, labels_train_loop):
-        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 3052, l_feat, True)
+        df_train_temp, df_test_temp=createFV_individual(data_train_loop[train_index], data_train_loop[test_index],f_split, 1000, l_feat, True)
         print(np.amax(df_train_temp.values))
         print(np.amin(df_train_temp.values))
         # Without feature selection check accuracy with Random forest
