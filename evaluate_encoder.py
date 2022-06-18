@@ -427,8 +427,6 @@ def baseline(args):
     labels_test_loop=label_data_test[str(args.tstep)]
 
     df_train_temp, df_test_temp=createFV_individual(data_train_loop, data_test_loop,f_split, 1000, l_feat, True)
-    print(np.amax(df_train_temp.values))
-    print(np.amin(df_train_temp.values))
     # Without feature selection check accuracy with Random forest
     if(args.classifier=="RF"):
         rf = RandomForestClassifier()
