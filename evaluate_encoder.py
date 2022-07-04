@@ -9,7 +9,7 @@ import EEGExtract as eeg
 import pywt
 from scipy.signal import hilbert, chirp
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import StratiifiedKFold
+#from sklearn.model_selection import StratiifiedKFold
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier 
 # Import the RFE from sklearn library
